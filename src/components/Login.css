@@ -1,0 +1,161 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eef9fd;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.login-logo {
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+  background: #e5f7fc;
+
+  font-size: 32px;
+}
+
+.login-card h1 {
+  text-align: center;
+  color: #087ea4;
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #718293;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 7px;
+  color: #17324d;
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 13px 15px;
+
+  border: 1px solid #d6e4eb;
+  border-radius: 10px;
+
+  font-size: 15px;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #087ea4;
+}
+
+.forgot-password {
+  text-align: right;
+  color: #087ea4;
+  font-size: 14px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #087ea4;
+  color: white;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background: #056d8c;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 25px 0;
+
+  color: #9aaab5;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: #e1e9ed;
+}
+
+.google-button {
+  width: 100%;
+  padding: 13px;
+
+  border: 1px solid #d6e4eb;
+  border-radius: 10px;
+
+  background: white;
+
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.google-button:hover {
+  background: #f6fbfd;
+}
+
+.register-text {
+  text-align: center;
+  margin-top: 25px;
+
+  color: #718293;
+  font-size: 14px;
+}
+
+.register-text span {
+  color: #087ea4;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Mobile */
+
+@media (max-width: 500px) {
+  .login-card {
+    padding: 30px 20px;
+  }
+
+  .login-card h1 {
+    font-size: 23px;
+  }
+}
