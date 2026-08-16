@@ -1,11 +1,22 @@
+import { useState } from "react";
+import Login from "./Login";
 import "./App.css";
 
 function App() {
+  const [page, setPage] = useState("home");
+
+  // Show Login Page
+  if (page === "login") {
+    return <Login />;
+  }
+
   return (
     <div className="app">
 
-      {/* NAVBAR */}
+      {/* ================= NAVBAR ================= */}
+
       <nav className="navbar">
+
         <div className="logo">
           ❤️ MAMA <span>Health Care</span>
         </div>
@@ -17,13 +28,18 @@ function App() {
           <a href="#contact">Contact</a>
         </div>
 
-        <button className="login-btn">
+        <button
+          className="login-btn"
+          onClick={() => setPage("login")}
+        >
           Login
         </button>
+
       </nav>
 
 
-      {/* HERO SECTION */}
+      {/* ================= HERO SECTION ================= */}
+
       <section className="hero" id="home">
 
         <div className="hero-content">
@@ -41,17 +57,29 @@ function App() {
           <p className="description">
             Your trusted digital healthcare companion.
             Get easy access to healthcare assistance,
-            smart technology and patient-friendly services
-            in one place.
+            smart technology and patient-friendly
+            services in one place.
           </p>
 
           <div className="buttons">
 
-            <button className="primary-btn">
+            <button
+              className="primary-btn"
+              onClick={() => setPage("login")}
+            >
               Get Started →
             </button>
 
-            <button className="secondary-btn">
+            <button
+              className="secondary-btn"
+              onClick={() =>
+                document
+                  .getElementById("services")
+                  .scrollIntoView({
+                    behavior: "smooth"
+                  })
+              }
+            >
               Learn More
             </button>
 
@@ -60,7 +88,8 @@ function App() {
         </div>
 
 
-        {/* HEALTHCARE CARD */}
+        {/* ================= HERO CARD ================= */}
+
         <div className="hero-right">
 
           <div className="circle">
@@ -92,8 +121,12 @@ function App() {
       </section>
 
 
-      {/* SERVICES */}
-      <section className="services" id="services">
+      {/* ================= SERVICES ================= */}
+
+      <section
+        className="services"
+        id="services"
+      >
 
         <p className="small-title">
           OUR FEATURES
@@ -112,42 +145,74 @@ function App() {
         <div className="cards">
 
           <div className="card">
-            <div className="icon">🩺</div>
-            <h3>Smart Healthcare</h3>
+
+            <div className="icon">
+              🩺
+            </div>
+
+            <h3>
+              Smart Healthcare
+            </h3>
+
             <p>
               Access healthcare assistance through
               a simple and user-friendly platform.
             </p>
+
           </div>
 
 
           <div className="card">
-            <div className="icon">🎤</div>
-            <h3>Voice Assistance</h3>
+
+            <div className="icon">
+              🎤
+            </div>
+
+            <h3>
+              Voice Assistance
+            </h3>
+
             <p>
               Use voice-based interaction to make
               healthcare services easier and faster.
             </p>
+
           </div>
 
 
           <div className="card">
-            <div className="icon">🤖</div>
-            <h3>AI Assistance</h3>
+
+            <div className="icon">
+              🤖
+            </div>
+
+            <h3>
+              AI Assistance
+            </h3>
+
             <p>
               Get intelligent assistance using
               modern AI-powered technology.
             </p>
+
           </div>
 
 
           <div className="card">
-            <div className="icon">🔒</div>
-            <h3>Secure Information</h3>
+
+            <div className="icon">
+              🔒
+            </div>
+
+            <h3>
+              Secure Information
+            </h3>
+
             <p>
               Keep important healthcare information
               organized and protected.
             </p>
+
           </div>
 
         </div>
@@ -155,8 +220,12 @@ function App() {
       </section>
 
 
-      {/* ABOUT */}
-      <section className="about" id="about">
+      {/* ================= ABOUT ================= */}
+
+      <section
+        className="about"
+        id="about"
+      >
 
         <div className="about-content">
 
@@ -177,8 +246,11 @@ function App() {
             technology-driven.
           </p>
 
-          <button className="primary-btn">
-            Explore MAMA Health Care →
+          <button
+            className="primary-btn"
+            onClick={() => setPage("login")}
+          >
+            Get Started →
           </button>
 
         </div>
@@ -204,7 +276,8 @@ function App() {
       </section>
 
 
-      {/* FOOTER */}
+      {/* ================= FOOTER ================= */}
+
       <footer id="contact">
 
         <h3>
