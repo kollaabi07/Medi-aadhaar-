@@ -1,7 +1,8 @@
 import { useState } from "react";
 import "./Register.css";
 
-function Register() {
+function Register({ setPage }) {
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -9,6 +10,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = (event) => {
+
     event.preventDefault();
 
     if (
@@ -27,7 +29,7 @@ function Register() {
       return;
     }
 
-    alert("Registration button clicked!");
+    alert("Registration successful!");
   };
 
   return (
@@ -39,7 +41,9 @@ function Register() {
           ❤️
         </div>
 
-        <h1>MAMA Health Care</h1>
+        <h1>
+          MAMA Health Care
+        </h1>
 
         <p className="register-subtitle">
           Create your account
@@ -47,8 +51,13 @@ function Register() {
 
         <form onSubmit={handleRegister}>
 
+          {/* NAME */}
+
           <div className="register-input">
-            <label>Full Name</label>
+
+            <label>
+              Full Name
+            </label>
 
             <input
               type="text"
@@ -58,10 +67,16 @@ function Register() {
                 setName(event.target.value)
               }
             />
+
           </div>
 
+          {/* EMAIL */}
+
           <div className="register-input">
-            <label>Email</label>
+
+            <label>
+              Email
+            </label>
 
             <input
               type="email"
@@ -71,10 +86,16 @@ function Register() {
                 setEmail(event.target.value)
               }
             />
+
           </div>
 
+          {/* MOBILE */}
+
           <div className="register-input">
-            <label>Mobile Number</label>
+
+            <label>
+              Mobile Number
+            </label>
 
             <input
               type="tel"
@@ -84,10 +105,16 @@ function Register() {
                 setMobile(event.target.value)
               }
             />
+
           </div>
 
+          {/* PASSWORD */}
+
           <div className="register-input">
-            <label>Password</label>
+
+            <label>
+              Password
+            </label>
 
             <input
               type="password"
@@ -97,10 +124,16 @@ function Register() {
                 setPassword(event.target.value)
               }
             />
+
           </div>
 
+          {/* CONFIRM PASSWORD */}
+
           <div className="register-input">
-            <label>Confirm Password</label>
+
+            <label>
+              Confirm Password
+            </label>
 
             <input
               type="password"
@@ -110,7 +143,10 @@ function Register() {
                 setConfirmPassword(event.target.value)
               }
             />
+
           </div>
+
+          {/* REGISTER BUTTON */}
 
           <button
             type="submit"
@@ -121,9 +157,18 @@ function Register() {
 
         </form>
 
+        {/* LOGIN LINK */}
+
         <p className="login-link">
+
           Already have an account?
-          <span> Login</span>
+
+          <span
+            onClick={() => setPage("login")}
+          >
+            {" "}Login
+          </span>
+
         </p>
 
       </div>

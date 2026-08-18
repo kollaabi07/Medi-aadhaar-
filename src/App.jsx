@@ -1,20 +1,26 @@
 import { useState } from "react";
 import Login from "./Login";
+import Register from "./components/Register";
 import "./App.css";
 
 function App() {
   const [page, setPage] = useState("home");
 
-  // Show Login Page
+  // LOGIN PAGE
   if (page === "login") {
-    return <Login />;
+    return <Login setPage={setPage} />;
   }
 
+  // REGISTER PAGE
+  if (page === "register") {
+    return <Register setPage={setPage} />;
+  }
+
+  // WELCOME PAGE
   return (
     <div className="app">
 
-      {/* ================= NAVBAR ================= */}
-
+      {/* NAVBAR */}
       <nav className="navbar">
 
         <div className="logo">
@@ -37,9 +43,7 @@ function App() {
 
       </nav>
 
-
-      {/* ================= HERO SECTION ================= */}
-
+      {/* HERO SECTION */}
       <section className="hero" id="home">
 
         <div className="hero-content">
@@ -87,9 +91,7 @@ function App() {
 
         </div>
 
-
-        {/* ================= HERO CARD ================= */}
-
+        {/* HERO RIGHT */}
         <div className="hero-right">
 
           <div className="circle">
@@ -120,9 +122,7 @@ function App() {
 
       </section>
 
-
-      {/* ================= SERVICES ================= */}
-
+      {/* SERVICES */}
       <section
         className="services"
         id="services"
@@ -140,7 +140,6 @@ function App() {
           Simple and intelligent healthcare support
           designed for everyone.
         </p>
-
 
         <div className="cards">
 
@@ -161,7 +160,6 @@ function App() {
 
           </div>
 
-
           <div className="card">
 
             <div className="icon">
@@ -179,7 +177,6 @@ function App() {
 
           </div>
 
-
           <div className="card">
 
             <div className="icon">
@@ -196,7 +193,6 @@ function App() {
             </p>
 
           </div>
-
 
           <div className="card">
 
@@ -219,9 +215,7 @@ function App() {
 
       </section>
 
-
-      {/* ================= ABOUT ================= */}
-
+      {/* ABOUT */}
       <section
         className="about"
         id="about"
@@ -255,7 +249,6 @@ function App() {
 
         </div>
 
-
         <div className="about-card">
 
           <div className="big-heart">
@@ -275,9 +268,7 @@ function App() {
 
       </section>
 
-
-      {/* ================= FOOTER ================= */}
-
+      {/* FOOTER */}
       <footer id="contact">
 
         <h3>
