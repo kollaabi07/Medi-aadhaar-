@@ -237,9 +237,13 @@ body {
     rgba(35, 100, 130, 0.15);
 }
 
-.doctor {
-  font-size: 80px;
-
+.doctor-image {
+  width: 145px;
+  height: 145px;
+  object-fit: cover;
+  object-position: center 32%;
+  border: 6px solid #e3f7ff;
+  border-radius: 50%;
   margin-bottom: 15px;
 }
 

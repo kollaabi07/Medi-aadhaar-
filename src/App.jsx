@@ -1,6 +1,8 @@
+import BackendTest from "./components/BackendTest";
 import { useState } from "react";
 import Login from "./Login";
 import Register from "./components/Register";
+import assistantImage from "./assets/healthcare-assistant.jpg";
 import "./App.css";
 
 function App() {
@@ -51,6 +53,7 @@ function App() {
           <p className="small-title">
             WELCOME TO MAMA HEALTH CARE
           </p>
+          <BackendTest />
 
           <h1>
             Smart Healthcare
@@ -98,9 +101,11 @@ function App() {
 
             <div className="doctor-card">
 
-              <div className="doctor">
-                👩‍⚕️
-              </div>
+              <img
+                className="doctor-image"
+                src={assistantImage}
+                alt="Healthcare assistant"
+              />
 
               <h3>
                 Healthcare Assistant
