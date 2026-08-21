@@ -9,9 +9,15 @@ function Register({ setPage }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = (event) => {
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const handleRegister = async (event) => {
 
     event.preventDefault();
+
+    setMessage("");
+    setError("");
 
     if (
       !name ||
@@ -20,17 +26,61 @@ function Register({ setPage }) {
       !password ||
       !confirmPassword
     ) {
-      alert("Please fill all fields");
+      setError("Please fill all fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
-    alert("Registration successful!");
+    try {
+
+      const response = await fetch(
+        "http://localhost:5000/api/register",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            name,
+            email,
+            mobile,
+            password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message);
+        return;
+      }
+
+      setMessage(data.message);
+
+      // Clear form
+      setName("");
+      setEmail("");
+      setMobile("");
+      setPassword("");
+      setConfirmPassword("");
+
+    } catch (error) {
+
+      console.error(error);
+
+      setError(
+        "Unable to connect to the server. Please make sure the backend is running."
+      );
+    }
   };
+
 
   return (
     <div className="register-page">
@@ -48,6 +98,25 @@ function Register({ setPage }) {
         <p className="register-subtitle">
           Create your account
         </p>
+
+
+        {/* SUCCESS MESSAGE */}
+
+        {message && (
+          <div className="success-message">
+            {message}
+          </div>
+        )}
+
+
+        {/* ERROR MESSAGE */}
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
 
         <form onSubmit={handleRegister}>
 
@@ -70,6 +139,7 @@ function Register({ setPage }) {
 
           </div>
 
+
           {/* EMAIL */}
 
           <div className="register-input">
@@ -88,6 +158,7 @@ function Register({ setPage }) {
             />
 
           </div>
+
 
           {/* MOBILE */}
 
@@ -108,6 +179,7 @@ function Register({ setPage }) {
 
           </div>
 
+
           {/* PASSWORD */}
 
           <div className="register-input">
@@ -127,6 +199,7 @@ function Register({ setPage }) {
 
           </div>
 
+
           {/* CONFIRM PASSWORD */}
 
           <div className="register-input">
@@ -142,9 +215,11 @@ function Register({ setPage }) {
               onChange={(event) =>
                 setConfirmPassword(event.target.value)
               }
+
             />
 
           </div>
+
 
           {/* REGISTER BUTTON */}
 
@@ -156,6 +231,7 @@ function Register({ setPage }) {
           </button>
 
         </form>
+
 
         {/* LOGIN LINK */}
 

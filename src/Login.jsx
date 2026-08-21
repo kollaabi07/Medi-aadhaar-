@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./components/Login.css";
 
-function Login() {
+function Login({ setPage }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,7 +13,7 @@ function Login() {
       return;
     }
 
-    alert("Login button clicked!");
+    alert("Login successful!");
   };
 
   return (
@@ -33,8 +33,13 @@ function Login() {
 
         <form onSubmit={handleLogin}>
 
+          {/* EMAIL */}
+
           <div className="input-group">
-            <label>Email</label>
+
+            <label>
+              Email
+            </label>
 
             <input
               type="email"
@@ -45,10 +50,17 @@ function Login() {
               }
               required
             />
+
           </div>
 
+
+          {/* PASSWORD */}
+
           <div className="input-group">
-            <label>Password</label>
+
+            <label>
+              Password
+            </label>
 
             <input
               type="password"
@@ -59,11 +71,18 @@ function Login() {
               }
               required
             />
+
           </div>
+
+
+          {/* FORGOT PASSWORD */}
 
           <div className="forgot-password">
             Forgot Password?
           </div>
+
+
+          {/* LOGIN BUTTON */}
 
           <button
             type="submit"
@@ -74,18 +93,51 @@ function Login() {
 
         </form>
 
+
+        {/* DIVIDER */}
+
         <div className="divider">
           <span>OR</span>
         </div>
 
-        <button className="google-button">
+
+        {/* GOOGLE */}
+
+        <button
+          type="button"
+          className="google-button"
+          onClick={() =>
+            alert("Google login will be added later.")
+          }
+        >
           🔵 Continue with Google
         </button>
 
+
+        {/* REGISTER */}
+
         <p className="register-text">
+
           Don't have an account?
-          <span> Register</span>
+
+          <span
+            onClick={() => setPage("register")}
+          >
+            {" "}Register
+          </span>
+
         </p>
+
+
+        {/* BACK TO HOME */}
+
+        <button
+          type="button"
+          className="back-home"
+          onClick={() => setPage("home")}
+        >
+          ← Back to Home
+        </button>
 
       </div>
 

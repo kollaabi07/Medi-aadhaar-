@@ -9,7 +9,11 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
-// Home route
+
+// ===============================
+// HOME API
+// ===============================
+
 app.get("/", (req, res) => {
   res.json({
     message: "MAMA Health Care Backend is running 🚀",
@@ -17,7 +21,11 @@ app.get("/", (req, res) => {
   });
 });
 
-// Test API
+
+// ===============================
+// TEST API
+// ===============================
+
 app.get("/api/test", (req, res) => {
   res.json({
     message: "MAMA Health Care API is working!",
@@ -25,7 +33,51 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-// Start server
+
+// ===============================
+// REGISTER API
+// ===============================
+
+app.post("/api/register", (req, res) => {
+
+  const {
+    name,
+    email,
+    mobile,
+    password
+  } = req.body;
+
+  console.log("New Registration:");
+  console.log("Name:", name);
+  console.log("Email:", email);
+  console.log("Mobile:", mobile);
+
+  if (!name || !email || !mobile || !password) {
+    return res.status(400).json({
+      message: "Please fill all required fields",
+      status: "error"
+    });
+  }
+
+  res.status(201).json({
+    message: "Registration successful!",
+    status: "success",
+    user: {
+      name,
+      email,
+      mobile
+    }
+  });
+
+});
+
+
+// ===============================
+// START SERVER
+// ===============================
+
 app.listen(PORT, () => {
-  console.log(`MAMA Health Care Server running on port ${PORT}`);
+  console.log(
+    `MAMA Health Care Server running on port ${PORT}`
+  );
 });
