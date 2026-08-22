@@ -2,19 +2,65 @@ import { useState } from "react";
 import "./components/Login.css";
 
 function Login({ setPage }) {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (event) => {
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+
+  const handleLogin = async (event) => {
+
     event.preventDefault();
 
+    setMessage("");
+    setError("");
+
     if (!email || !password) {
-      alert("Please enter email and password");
+      setError("Please enter email and password.");
       return;
     }
 
-    alert("Login successful!");
+    try {
+
+      const response = await fetch(
+        "http://localhost:5000/api/login",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            email,
+            password
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message);
+        return;
+      }
+
+      setMessage(data.message);
+
+      console.log("Login Response:", data);
+
+    } catch (error) {
+
+      console.error(error);
+
+      setError(
+        "Unable to connect to the server. Please make sure the backend is running."
+      );
+    }
   };
+
 
   return (
     <div className="login-page">
@@ -25,11 +71,32 @@ function Login({ setPage }) {
           ❤️
         </div>
 
-        <h1>MAMA Health Care</h1>
+        <h1>
+          MAMA Health Care
+        </h1>
 
         <p className="login-subtitle">
           Login to your account
         </p>
+
+
+        {/* SUCCESS MESSAGE */}
+
+        {message && (
+          <div className="success-message">
+            {message}
+          </div>
+        )}
+
+
+        {/* ERROR MESSAGE */}
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
 
         <form onSubmit={handleLogin}>
 
@@ -94,14 +161,11 @@ function Login({ setPage }) {
         </form>
 
 
-        {/* DIVIDER */}
+        {/* GOOGLE */}
 
         <div className="divider">
           <span>OR</span>
         </div>
-
-
-        {/* GOOGLE */}
 
         <button
           type="button"
@@ -129,7 +193,7 @@ function Login({ setPage }) {
         </p>
 
 
-        {/* BACK TO HOME */}
+        {/* BACK HOME */}
 
         <button
           type="button"

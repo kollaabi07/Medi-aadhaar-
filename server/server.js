@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 // ===============================
-// HOME API
+// HOME
 // ===============================
 
 app.get("/", (req, res) => {
@@ -68,7 +68,38 @@ app.post("/api/register", (req, res) => {
       mobile
     }
   });
+});
 
+
+// ===============================
+// LOGIN API
+// ===============================
+
+app.post("/api/login", (req, res) => {
+
+  const {
+    email,
+    password
+  } = req.body;
+
+  console.log("Login Request:");
+  console.log("Email:", email);
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email and password are required",
+      status: "error"
+    });
+  }
+
+  // Temporary login test
+  res.status(200).json({
+    message: "Login successful!",
+    status: "success",
+    user: {
+      email
+    }
+  });
 });
 
 
