@@ -6,23 +6,20 @@ function Login({ setPage }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-
-
   const handleLogin = async (event) => {
 
     event.preventDefault();
 
-    setMessage("");
-    setError("");
+    console.log("Login button clicked");
 
     if (!email || !password) {
-      setError("Please enter email and password.");
+      alert("Please enter email and password");
       return;
     }
 
     try {
+
+      console.log("Sending login request...");
 
       const response = await fetch(
         "http://localhost:5000/api/login",
@@ -34,35 +31,58 @@ function Login({ setPage }) {
           },
 
           body: JSON.stringify({
-            email,
-            password
+            email: email,
+            password: password
           })
         }
       );
 
+      console.log(
+        "Server response status:",
+        response.status
+      );
+
       const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.message);
-        return;
+      console.log(
+        "Server response:",
+        data
+      );
+
+      if (response.ok) {
+
+        alert("Login successful! 🎉");
+
+        console.log(
+          "Logged in user:",
+          data.user
+        );
+
+        setPage("home");
+
+      } else {
+
+        alert(
+          data.message || "Login failed"
+        );
+
       }
-
-      setMessage(data.message);
-
-      console.log("Login Response:", data);
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Login error:",
+        error
+      );
 
-      setError(
-        "Unable to connect to the server. Please make sure the backend is running."
+      alert(
+        "Unable to connect to server"
       );
     }
   };
 
-
   return (
+
     <div className="login-page">
 
       <div className="login-card">
@@ -79,28 +99,7 @@ function Login({ setPage }) {
           Login to your account
         </p>
 
-
-        {/* SUCCESS MESSAGE */}
-
-        {message && (
-          <div className="success-message">
-            {message}
-          </div>
-        )}
-
-
-        {/* ERROR MESSAGE */}
-
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
-
-
         <form onSubmit={handleLogin}>
-
-          {/* EMAIL */}
 
           <div className="input-group">
 
@@ -120,9 +119,6 @@ function Login({ setPage }) {
 
           </div>
 
-
-          {/* PASSWORD */}
-
           <div className="input-group">
 
             <label>
@@ -141,15 +137,9 @@ function Login({ setPage }) {
 
           </div>
 
-
-          {/* FORGOT PASSWORD */}
-
           <div className="forgot-password">
             Forgot Password?
           </div>
-
-
-          {/* LOGIN BUTTON */}
 
           <button
             type="submit"
@@ -160,48 +150,29 @@ function Login({ setPage }) {
 
         </form>
 
-
-        {/* GOOGLE */}
-
         <div className="divider">
           <span>OR</span>
         </div>
 
         <button
-          type="button"
           className="google-button"
-          onClick={() =>
-            alert("Google login will be added later.")
-          }
         >
           🔵 Continue with Google
         </button>
-
-
-        {/* REGISTER */}
 
         <p className="register-text">
 
           Don't have an account?
 
           <span
-            onClick={() => setPage("register")}
+            onClick={() =>
+              setPage("register")
+            }
           >
             {" "}Register
           </span>
 
         </p>
-
-
-        {/* BACK HOME */}
-
-        <button
-          type="button"
-          className="back-home"
-          onClick={() => setPage("home")}
-        >
-          ← Back to Home
-        </button>
 
       </div>
 
