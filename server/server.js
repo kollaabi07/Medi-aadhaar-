@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-
+const bcrypt = require("bcrypt");
 const User = require("./models/User");
 
 const app = express();
@@ -73,14 +73,16 @@ app.post("/api/register", async (req, res) => {
       });
     }
 
-    const newUser = new User({
-      name,
-      email,
-      mobile,
-      password
-    });
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    await newUser.save();
+const newUser = new User({
+  name,
+  email,
+  mobile,
+  password: hashedPassword
+});
+
+await newUser.save();
 
     console.log("User saved successfully");
 
@@ -134,14 +136,19 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
-    if (user.password !== password) {
-      console.log("Incorrect password");
+   const passwordMatch = await bcrypt.compare(
+  password,
+  user.password
+);
 
-      return res.status(401).json({
-        message: "Incorrect password",
-        status: "error"
-      });
-    }
+if (!passwordMatch) {
+  console.log("Incorrect password");
+
+  return res.status(401).json({
+    message: "Incorrect password",
+    status: "error"
+  });
+}
 
     console.log("Login successful for:", email);
 
