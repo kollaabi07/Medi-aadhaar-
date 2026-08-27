@@ -2,12 +2,10 @@ import { useState } from "react";
 import "./components/Login.css";
 
 function Login({ setPage }) {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async (event) => {
-
     event.preventDefault();
 
     console.log("Login button clicked");
@@ -18,18 +16,15 @@ function Login({ setPage }) {
     }
 
     try {
-
       console.log("Sending login request...");
 
       const response = await fetch(
         "http://localhost:5000/api/login",
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json"
           },
-
           body: JSON.stringify({
             email: email,
             password: password
@@ -44,13 +39,9 @@ function Login({ setPage }) {
 
       const data = await response.json();
 
-      console.log(
-        "Server response:",
-        data
-      );
+      console.log("Server response:", data);
 
       if (response.ok) {
-
         alert("Login successful! 🎉");
 
         console.log(
@@ -58,18 +49,22 @@ function Login({ setPage }) {
           data.user
         );
 
+        // Save logged-in user
+        localStorage.setItem(
+          "loggedInUser",
+          JSON.stringify(data.user)
+        );
+
+        // Go to home page
         setPage("home");
 
       } else {
-
         alert(
           data.message || "Login failed"
         );
-
       }
 
     } catch (error) {
-
       console.error(
         "Login error:",
         error
@@ -82,7 +77,6 @@ function Login({ setPage }) {
   };
 
   return (
-
     <div className="login-page">
 
       <div className="login-card">
@@ -102,7 +96,6 @@ function Login({ setPage }) {
         <form onSubmit={handleLogin}>
 
           <div className="input-group">
-
             <label>
               Email
             </label>
@@ -116,11 +109,9 @@ function Login({ setPage }) {
               }
               required
             />
-
           </div>
 
           <div className="input-group">
-
             <label>
               Password
             </label>
@@ -134,7 +125,6 @@ function Login({ setPage }) {
               }
               required
             />
-
           </div>
 
           <div className="forgot-password">
@@ -161,7 +151,6 @@ function Login({ setPage }) {
         </button>
 
         <p className="register-text">
-
           Don't have an account?
 
           <span
@@ -171,7 +160,6 @@ function Login({ setPage }) {
           >
             {" "}Register
           </span>
-
         </p>
 
       </div>

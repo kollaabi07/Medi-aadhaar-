@@ -8,6 +8,20 @@ import "./App.css";
 function App() {
   const [page, setPage] = useState("home");
 
+  // Get logged-in user
+  const savedUser = localStorage.getItem("loggedInUser");
+
+  const user = savedUser
+    ? JSON.parse(savedUser)
+    : null;
+
+  // LOGOUT
+  const handleLogout = () => {
+    localStorage.removeItem("loggedInUser");
+    setPage("home");
+    alert("Logged out successfully 👋");
+  };
+
   // LOGIN PAGE
   if (page === "login") {
     return <Login setPage={setPage} />;
@@ -36,12 +50,29 @@ function App() {
           <a href="#contact">Contact</a>
         </div>
 
-        <button
-          className="login-btn"
-          onClick={() => setPage("login")}
-        >
-          Login
-        </button>
+        {user ? (
+          <div className="user-section">
+
+            <span>
+              👤 {user.name}
+            </span>
+
+            <button
+              className="login-btn"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+
+          </div>
+        ) : (
+          <button
+            className="login-btn"
+            onClick={() => setPage("login")}
+          >
+            Login
+          </button>
+        )}
 
       </nav>
 
@@ -53,6 +84,7 @@ function App() {
           <p className="small-title">
             WELCOME TO MAMA HEALTH CARE
           </p>
+
           <BackendTest />
 
           <h1>
@@ -68,14 +100,22 @@ function App() {
             services in one place.
           </p>
 
+          {user && (
+            <p>
+              Welcome back, <strong>{user.name}</strong>! 👋
+            </p>
+          )}
+
           <div className="buttons">
 
-            <button
-              className="primary-btn"
-              onClick={() => setPage("login")}
-            >
-              Get Started →
-            </button>
+            {!user && (
+              <button
+                className="primary-btn"
+                onClick={() => setPage("login")}
+              >
+                Get Started →
+              </button>
+            )}
 
             <button
               className="secondary-btn"
@@ -245,12 +285,14 @@ function App() {
             technology-driven.
           </p>
 
-          <button
-            className="primary-btn"
-            onClick={() => setPage("login")}
-          >
-            Get Started →
-          </button>
+          {!user && (
+            <button
+              className="primary-btn"
+              onClick={() => setPage("login")}
+            >
+              Get Started →
+            </button>
+          )}
 
         </div>
 
