@@ -1,61 +1,93 @@
-import BackendTest from "./components/BackendTest";
 import { useState } from "react";
 import Login from "./Login";
 import Register from "./components/Register";
+import BackendTest from "./components/BackendTest";
 import assistantImage from "./assets/healthcare-assistant.jpg";
 import "./App.css";
 
 function App() {
   const [page, setPage] = useState("home");
 
-  // Get logged-in user
   const savedUser = localStorage.getItem("loggedInUser");
 
-  const user = savedUser
-    ? JSON.parse(savedUser)
-    : null;
+  let user = null;
 
+  try {
+    user = savedUser ? JSON.parse(savedUser) : null;
+  } catch (error) {
+    localStorage.removeItem("loggedInUser");
+  }
+
+  // =========================
   // LOGOUT
+  // =========================
   const handleLogout = () => {
     localStorage.removeItem("loggedInUser");
     setPage("home");
     alert("Logged out successfully 👋");
   };
 
+  // =========================
   // LOGIN PAGE
+  // =========================
   if (page === "login") {
     return <Login setPage={setPage} />;
   }
 
+  // =========================
   // REGISTER PAGE
+  // =========================
   if (page === "register") {
     return <Register setPage={setPage} />;
   }
 
-  // WELCOME PAGE
-  return (
-    <div className="app">
+  // =========================
+  // PROFILE PAGE
+  // =========================
+  if (page === "profile") {
+    return (
+      <div className="profile-page">
 
-      {/* NAVBAR */}
-      <nav className="navbar">
+        <div className="profile-card">
 
-        <div className="logo">
-          ❤️ MAMA <span>Health Care</span>
-        </div>
+          <div className="profile-icon">
+            👤
+          </div>
 
-        <div className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#services">Services</a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
-        </div>
+          <h1>My Profile</h1>
 
-        {user ? (
-          <div className="user-section">
+          <div className="profile-info">
 
-            <span>
-              👤 {user.name}
-            </span>
+            <p>
+              <strong>Name:</strong>
+              <span>{user?.name || "User"}</span>
+            </p>
+
+            <p>
+              <strong>Email:</strong>
+              <span>{user?.email || "Not available"}</span>
+            </p>
+
+            <p>
+              <strong>Mobile:</strong>
+              <span>{user?.mobile || "Not available"}</span>
+            </p>
+
+            <p>
+              <strong>Status:</strong>
+              <span>Active ✅</span>
+            </p>
+
+          </div>
+
+          <div className="profile-buttons">
+
+            <button
+              className="primary-btn"
+              onClick={() => setPage("home")}
+            >
+              ← Back to Home
+            </button>
 
             <button
               className="login-btn"
@@ -65,19 +97,100 @@ function App() {
             </button>
 
           </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  // =========================
+  // HOME PAGE
+  // =========================
+  return (
+    <div className="app">
+
+      {/* =========================
+          NAVBAR
+      ========================== */}
+
+      <nav className="navbar">
+
+        <div
+          className="logo"
+          onClick={() => setPage("home")}
+        >
+          ❤️ MAMA
+          <span> Health Care</span>
+        </div>
+
+        <div className="nav-links">
+
+          <a href="#home">
+            Home
+          </a>
+
+          <a href="#services">
+            Services
+          </a>
+
+          <a href="#about">
+            About
+          </a>
+
+          <a href="#contact">
+            Contact
+          </a>
+
+        </div>
+
+        {/* USER LOGGED IN */}
+
+        {user ? (
+
+          <div className="user-section">
+
+            <span className="welcome-user">
+              👤 {user.name}
+            </span>
+
+            <button
+              className="profile-btn"
+              onClick={() => setPage("profile")}
+            >
+              Profile
+            </button>
+
+            <button
+              className="login-btn"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+
+          </div>
+
         ) : (
+
           <button
             className="login-btn"
             onClick={() => setPage("login")}
           >
             Login
           </button>
+
         )}
 
       </nav>
 
-      {/* HERO SECTION */}
-      <section className="hero" id="home">
+      {/* =========================
+          HERO SECTION
+      ========================== */}
+
+      <section
+        className="hero"
+        id="home"
+      >
 
         <div className="hero-content">
 
@@ -101,31 +214,40 @@ function App() {
           </p>
 
           {user && (
-            <p>
-              Welcome back, <strong>{user.name}</strong>! 👋
-            </p>
+
+            <div className="welcome-message">
+
+              Welcome back,
+              <strong> {user.name}</strong>! 👋
+
+            </div>
+
           )}
 
           <div className="buttons">
 
             {!user && (
+
               <button
                 className="primary-btn"
                 onClick={() => setPage("login")}
               >
                 Get Started →
               </button>
+
             )}
 
             <button
               className="secondary-btn"
-              onClick={() =>
+              onClick={() => {
+
                 document
                   .getElementById("services")
-                  .scrollIntoView({
+                  ?.scrollIntoView({
                     behavior: "smooth"
-                  })
-              }
+                  });
+
+              }}
             >
               Learn More
             </button>
@@ -134,18 +256,25 @@ function App() {
 
         </div>
 
-        {/* HERO RIGHT */}
+        {/* =========================
+            3D HEALTHCARE CARD
+        ========================== */}
+
         <div className="hero-right">
 
           <div className="circle">
 
             <div className="doctor-card">
 
-              <img
-                className="doctor-image"
-                src={assistantImage}
-                alt="Healthcare assistant"
-              />
+              <div className="doctor-image-container">
+
+                <img
+                  src={assistantImage}
+                  alt="Healthcare Assistant"
+                  className="doctor-image"
+                />
+
+              </div>
 
               <h3>
                 Healthcare Assistant
@@ -167,7 +296,10 @@ function App() {
 
       </section>
 
-      {/* SERVICES */}
+      {/* =========================
+          SERVICES
+      ========================== */}
+
       <section
         className="services"
         id="services"
@@ -260,7 +392,10 @@ function App() {
 
       </section>
 
-      {/* ABOUT */}
+      {/* =========================
+          ABOUT
+      ========================== */}
+
       <section
         className="about"
         id="about"
@@ -286,12 +421,14 @@ function App() {
           </p>
 
           {!user && (
+
             <button
               className="primary-btn"
               onClick={() => setPage("login")}
             >
               Get Started →
             </button>
+
           )}
 
         </div>
@@ -315,7 +452,10 @@ function App() {
 
       </section>
 
-      {/* FOOTER */}
+      {/* =========================
+          FOOTER
+      ========================== */}
+
       <footer id="contact">
 
         <h3>
