@@ -8,6 +8,7 @@ import "./App.css";
 function App() {
   const [page, setPage] = useState("home");
 
+  // Get logged-in user from localStorage
   const savedUser = localStorage.getItem("loggedInUser");
 
   let user = null;
@@ -18,32 +19,32 @@ function App() {
     localStorage.removeItem("loggedInUser");
   }
 
-  // =========================
+  // ==============================
   // LOGOUT
-  // =========================
+  // ==============================
   const handleLogout = () => {
     localStorage.removeItem("loggedInUser");
     setPage("home");
     alert("Logged out successfully 👋");
   };
 
-  // =========================
+  // ==============================
   // LOGIN PAGE
-  // =========================
+  // ==============================
   if (page === "login") {
     return <Login setPage={setPage} />;
   }
 
-  // =========================
+  // ==============================
   // REGISTER PAGE
-  // =========================
+  // ==============================
   if (page === "register") {
     return <Register setPage={setPage} />;
   }
 
-  // =========================
+  // ==============================
   // PROFILE PAGE
-  // =========================
+  // ==============================
   if (page === "profile") {
     return (
       <div className="profile-page">
@@ -59,22 +60,22 @@ function App() {
           <div className="profile-info">
 
             <p>
-              <strong>Name:</strong>
+              <strong>Name</strong>
               <span>{user?.name || "User"}</span>
             </p>
 
             <p>
-              <strong>Email:</strong>
+              <strong>Email</strong>
               <span>{user?.email || "Not available"}</span>
             </p>
 
             <p>
-              <strong>Mobile:</strong>
+              <strong>Mobile</strong>
               <span>{user?.mobile || "Not available"}</span>
             </p>
 
             <p>
-              <strong>Status:</strong>
+              <strong>Status</strong>
               <span>Active ✅</span>
             </p>
 
@@ -104,15 +105,15 @@ function App() {
     );
   }
 
-  // =========================
+  // ==============================
   // HOME PAGE
-  // =========================
+  // ==============================
   return (
     <div className="app">
 
-      {/* =========================
+      {/* ==============================
           NAVBAR
-      ========================== */}
+      ============================== */}
 
       <nav className="navbar">
 
@@ -143,8 +144,6 @@ function App() {
           </a>
 
         </div>
-
-        {/* USER LOGGED IN */}
 
         {user ? (
 
@@ -183,9 +182,9 @@ function App() {
 
       </nav>
 
-      {/* =========================
+      {/* ==============================
           HERO SECTION
-      ========================== */}
+      ============================== */}
 
       <section
         className="hero"
@@ -214,40 +213,32 @@ function App() {
           </p>
 
           {user && (
-
             <div className="welcome-message">
-
               Welcome back,
               <strong> {user.name}</strong>! 👋
-
             </div>
-
           )}
 
           <div className="buttons">
 
             {!user && (
-
               <button
                 className="primary-btn"
                 onClick={() => setPage("login")}
               >
                 Get Started →
               </button>
-
             )}
 
             <button
               className="secondary-btn"
-              onClick={() => {
-
+              onClick={() =>
                 document
                   .getElementById("services")
                   ?.scrollIntoView({
                     behavior: "smooth"
-                  });
-
-              }}
+                  })
+              }
             >
               Learn More
             </button>
@@ -256,37 +247,108 @@ function App() {
 
         </div>
 
-        {/* =========================
-            3D HEALTHCARE CARD
-        ========================== */}
+        {/* ==============================
+            DAY 16 - 3D HEALTH DASHBOARD
+        ============================== */}
 
         <div className="hero-right">
 
-          <div className="circle">
+          <div className="health-3d-scene">
 
-            <div className="doctor-card">
+            {/* CENTRAL ORB */}
 
-              <div className="doctor-image-container">
+            <div className="health-orb">
+
+              <div className="health-orb-inner">
+                ❤️
+              </div>
+
+            </div>
+
+            {/* HEART RATE */}
+
+            <div className="health-card heart-rate-card">
+
+              <div className="health-card-icon">
+                ❤️
+              </div>
+
+              <div>
+                <small>
+                  Heart Rate
+                </small>
+
+                <h3>
+                  72 BPM
+                </h3>
+              </div>
+
+            </div>
+
+            {/* HYDRATION */}
+
+            <div className="health-card hydration-card">
+
+              <div className="health-card-icon">
+                💧
+              </div>
+
+              <div>
+                <small>
+                  Hydration
+                </small>
+
+                <h3>
+                  85%
+                </h3>
+              </div>
+
+            </div>
+
+            {/* HEALTH SCORE */}
+
+            <div className="health-card score-card">
+
+              <div className="health-card-icon">
+                🩺
+              </div>
+
+              <div>
+                <small>
+                  Health Score
+                </small>
+
+                <h3>
+                  94%
+                </h3>
+              </div>
+
+            </div>
+
+            {/* AI ASSISTANT CARD */}
+
+            <div className="health-center-card">
+
+              <div className="doctor-small">
 
                 <img
                   src={assistantImage}
                   alt="Healthcare Assistant"
-                  className="doctor-image"
                 />
 
               </div>
 
               <h3>
-                Healthcare Assistant
+                MAMA AI
               </h3>
 
               <p>
-                Always here to help you
+                Your Health Assistant
               </p>
 
-              <div className="available">
-                ● Available
-              </div>
+              <span className="ai-online">
+                ● Online
+              </span>
 
             </div>
 
@@ -296,9 +358,9 @@ function App() {
 
       </section>
 
-      {/* =========================
+      {/* ==============================
           SERVICES
-      ========================== */}
+      ============================== */}
 
       <section
         className="services"
@@ -392,9 +454,9 @@ function App() {
 
       </section>
 
-      {/* =========================
+      {/* ==============================
           ABOUT
-      ========================== */}
+      ============================== */}
 
       <section
         className="about"
@@ -421,14 +483,12 @@ function App() {
           </p>
 
           {!user && (
-
             <button
               className="primary-btn"
               onClick={() => setPage("login")}
             >
               Get Started →
             </button>
-
           )}
 
         </div>
@@ -452,9 +512,9 @@ function App() {
 
       </section>
 
-      {/* =========================
+      {/* ==============================
           FOOTER
-      ========================== */}
+      ============================== */}
 
       <footer id="contact">
 
