@@ -2,155 +2,82 @@ import { useState } from "react";
 import Login from "./Login";
 import Register from "./components/Register";
 import BackendTest from "./components/BackendTest";
+import HealthDashboard from "./components/HealthDashboard";
 import assistantImage from "./assets/healthcare-assistant.jpg";
 import "./App.css";
-
 function App() {
   const [page, setPage] = useState("home");
+  const [user, setUser] = useState(null);
 
-  // Get logged-in user from localStorage
-  const savedUser = localStorage.getItem("loggedInUser");
-
-  let user = null;
-
-  try {
-    user = savedUser ? JSON.parse(savedUser) : null;
-  } catch (error) {
-    localStorage.removeItem("loggedInUser");
-  }
-
-  // ==============================
-  // LOGOUT
-  // ==============================
-  const handleLogout = () => {
-    localStorage.removeItem("loggedInUser");
-    setPage("home");
-    alert("Logged out successfully 👋");
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
+    setPage("dashboard");
   };
 
-  // ==============================
-  // LOGIN PAGE
-  // ==============================
+  const handleLogout = () => {
+    setUser(null);
+    setPage("home");
+  };
+
+  const handleRegisterSuccess = () => {
+    setPage("login");
+  };
+
   if (page === "login") {
-    return <Login setPage={setPage} />;
-  }
-
-  // ==============================
-  // REGISTER PAGE
-  // ==============================
-  if (page === "register") {
-    return <Register setPage={setPage} />;
-  }
-
-  // ==============================
-  // PROFILE PAGE
-  // ==============================
-  if (page === "profile") {
     return (
-      <div className="profile-page">
-
-        <div className="profile-card">
-
-          <div className="profile-icon">
-            👤
-          </div>
-
-          <h1>My Profile</h1>
-
-          <div className="profile-info">
-
-            <p>
-              <strong>Name</strong>
-              <span>{user?.name || "User"}</span>
-            </p>
-
-            <p>
-              <strong>Email</strong>
-              <span>{user?.email || "Not available"}</span>
-            </p>
-
-            <p>
-              <strong>Mobile</strong>
-              <span>{user?.mobile || "Not available"}</span>
-            </p>
-
-            <p>
-              <strong>Status</strong>
-              <span>Active ✅</span>
-            </p>
-
-          </div>
-
-          <div className="profile-buttons">
-
-            <button
-              className="primary-btn"
-              onClick={() => setPage("home")}
-            >
-              ← Back to Home
-            </button>
-
-            <button
-              className="login-btn"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-
-          </div>
-
-        </div>
-
+      <div className="app">
+        <Login
+          onLoginSuccess={handleLoginSuccess}
+          onBack={() => setPage("home")}
+        />
       </div>
     );
   }
 
-  // ==============================
-  // HOME PAGE
-  // ==============================
-  return (
-    <div className="app">
+  if (page === "register") {
+    return (
+      <div className="app">
+        <Register
+          onRegisterSuccess={handleRegisterSuccess}
+          onBack={() => setPage("home")}
+        />
+      </div>
+    );
+  }
 
-      {/* ==============================
-          NAVBAR
-      ============================== */}
+  if (page === "dashboard") {
+    return (
+      <div className="app">
+        <nav className="navbar">
+          <div className="logo" onClick={() => setPage("home")}>
+            ❤️ MAMA <span>Health Care</span>
+          </div>
 
-      <nav className="navbar">
+          <div className="nav-links">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setPage("home");
+              }}
+            >
+              Home
+            </a>
 
-        <div
-          className="logo"
-          onClick={() => setPage("home")}
-        >
-          ❤️ MAMA
-          <span> Health Care</span>
-        </div>
-
-        <div className="nav-links">
-
-          <a href="#home">
-            Home
-          </a>
-
-          <a href="#services">
-            Services
-          </a>
-
-          <a href="#about">
-            About
-          </a>
-
-          <a href="#contact">
-            Contact
-          </a>
-
-        </div>
-
-        {user ? (
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setPage("dashboard");
+              }}
+            >
+              Dashboard
+            </a>
+          </div>
 
           <div className="user-section">
-
             <span className="welcome-user">
-              👤 {user.name}
+              Hi, {user?.name || "User"}
             </span>
 
             <button
@@ -166,38 +93,163 @@ function App() {
             >
               Logout
             </button>
+          </div>
+        </nav>
 
+        <HealthDashboard />
+
+        <footer>
+          <h3>❤️ MAMA Health Care</h3>
+          <p>Smart healthcare for everyone.</p>
+          <p>© 2026 MAMA Health Care. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  }
+
+  if (page === "profile") {
+    return (
+      <div className="app">
+        <nav className="navbar">
+          <div
+            className="logo"
+            onClick={() => setPage("home")}
+          >
+            ❤️ MAMA <span>Health Care</span>
           </div>
 
-        ) : (
+          <div className="user-section">
+            <button
+              className="profile-btn"
+              onClick={() => setPage("dashboard")}
+            >
+              Dashboard
+            </button>
 
-          <button
-            className="login-btn"
-            onClick={() => setPage("login")}
-          >
-            Login
-          </button>
+            <button
+              className="login-btn"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        </nav>
 
-        )}
+        <section className="profile-page">
+          <div className="profile-card">
+            <div className="profile-icon">👤</div>
 
+            <h1>My Profile</h1>
+
+            <div className="profile-info">
+              <p>
+                <strong>Name</strong>
+                <span>{user?.name || "User"}</span>
+              </p>
+
+              <p>
+                <strong>Email</strong>
+                <span>{user?.email || "Not available"}</span>
+              </p>
+
+              <p>
+                <strong>Phone</strong>
+                <span>{user?.mobile || "Not available"}</span>
+              </p>
+
+              <p>
+                <strong>Status</strong>
+                <span>Active</span>
+              </p>
+            </div>
+
+            <button
+              className="primary-btn"
+              onClick={() => setPage("dashboard")}
+            >
+              Health Dashboard
+            </button>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app">
+
+      <nav className="navbar">
+        <div
+          className="logo"
+          onClick={() => setPage("home")}
+        >
+          ❤️ MAMA <span>Health Care</span>
+        </div>
+
+        <div className="nav-links">
+          <a href="#home">Home</a>
+          <a href="#services">Services</a>
+          <a href="#about">About</a>
+        </div>
+
+        <div className="user-section">
+          {user ? (
+            <>
+              <span className="welcome-user">
+                Hi, {user.name || "User"}
+              </span>
+
+              <button
+                className="profile-btn"
+                onClick={() => setPage("profile")}
+              >
+                Profile
+              </button>
+
+              <button
+                className="login-btn"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="login-btn"
+                onClick={() => setPage("login")}
+              >
+                Login
+              </button>
+
+              <button
+                className="profile-btn"
+                onClick={() => setPage("register")}
+              >
+                Register
+              </button>
+            </>
+          )}
+        </div>
       </nav>
 
-      {/* ==============================
-          HERO SECTION
-      ============================== */}
-
-      <section
-        className="hero"
-        id="home"
-      >
+      <section className="hero" id="home">
 
         <div className="hero-content">
 
           <p className="small-title">
-            WELCOME TO MAMA HEALTH CARE
+            SMART HEALTHCARE PLATFORM
           </p>
 
-          <BackendTest />
+          <div className="backend-status">
+            🔌 Backend Connected
+          </div>
+
+          {user && (
+            <div className="welcome-message">
+              Welcome back, {user.name || "User"}! ❤️
+            </div>
+          )}
 
           <h1>
             Smart Healthcare
@@ -206,144 +258,87 @@ function App() {
           </h1>
 
           <p className="description">
-            Your trusted digital healthcare companion.
-            Get easy access to healthcare assistance,
-            smart technology and patient-friendly
-            services in one place.
+            MAMA Health Care helps you monitor your
+            health, understand your health information,
+            and stay connected with smarter healthcare
+            technology.
           </p>
 
-          {user && (
-            <div className="welcome-message">
-              Welcome back,
-              <strong> {user.name}</strong>! 👋
-            </div>
-          )}
-
           <div className="buttons">
+            <button
+              className="primary-btn"
+              onClick={() => setPage("dashboard")}
+            >
+              View Health Dashboard
+            </button>
 
             {!user && (
               <button
-                className="primary-btn"
-                onClick={() => setPage("login")}
+                className="secondary-btn"
+                onClick={() => setPage("register")}
               >
-                Get Started →
+                Get Started
               </button>
             )}
-
-            <button
-              className="secondary-btn"
-              onClick={() =>
-                document
-                  .getElementById("services")
-                  ?.scrollIntoView({
-                    behavior: "smooth"
-                  })
-              }
-            >
-              Learn More
-            </button>
-
           </div>
 
         </div>
 
-        {/* ==============================
-            DAY 16 - 3D HEALTH DASHBOARD
-        ============================== */}
-
         <div className="hero-right">
-
           <div className="health-3d-scene">
 
-            {/* CENTRAL ORB */}
-
             <div className="health-orb">
-
               <div className="health-orb-inner">
                 ❤️
               </div>
-
             </div>
 
-            {/* HEART RATE */}
-
             <div className="health-card heart-rate-card">
-
               <div className="health-card-icon">
                 ❤️
               </div>
 
               <div>
-                <small>
-                  Heart Rate
-                </small>
-
-                <h3>
-                  72 BPM
-                </h3>
+                <small>Heart Rate</small>
+                <h3>72 BPM</h3>
               </div>
-
             </div>
 
-            {/* HYDRATION */}
-
             <div className="health-card hydration-card">
-
               <div className="health-card-icon">
                 💧
               </div>
 
               <div>
-                <small>
-                  Hydration
-                </small>
-
-                <h3>
-                  85%
-                </h3>
+                <small>Hydration</small>
+                <h3>85%</h3>
               </div>
-
             </div>
 
-            {/* HEALTH SCORE */}
-
             <div className="health-card score-card">
-
               <div className="health-card-icon">
-                🩺
+                ⭐
               </div>
 
               <div>
-                <small>
-                  Health Score
-                </small>
-
-                <h3>
-                  94%
-                </h3>
+                <small>Health Score</small>
+                <h3>94%</h3>
               </div>
-
             </div>
-
-            {/* AI ASSISTANT CARD */}
 
             <div className="health-center-card">
 
               <div className="doctor-small">
-
                 <img
                   src={assistantImage}
-                  alt="Healthcare Assistant"
+                  alt="MAMA Health Assistant"
                 />
-
               </div>
 
-              <h3>
-                MAMA AI
-              </h3>
+              <h3>MAMA AI</h3>
 
               <p>
-                Your Health Assistant
+                Your smart health assistant
               </p>
 
               <span className="ai-online">
@@ -353,183 +348,128 @@ function App() {
             </div>
 
           </div>
-
         </div>
 
       </section>
 
-      {/* ==============================
-          SERVICES
-      ============================== */}
+      <section className="services" id="services">
 
-      <section
-        className="services"
-        id="services"
-      >
-
-        <p className="small-title">
-          OUR FEATURES
-        </p>
-
-        <h2>
-          Why Choose MAMA Health Care?
-        </h2>
+        <h2>Smart Health Services</h2>
 
         <p className="section-description">
-          Simple and intelligent healthcare support
-          designed for everyone.
+          Technology-powered healthcare tools
+          designed to help you understand and
+          manage your health.
         </p>
 
         <div className="cards">
 
           <div className="card">
+            <div className="icon">❤️</div>
 
-            <div className="icon">
-              🩺
-            </div>
-
-            <h3>
-              Smart Healthcare
-            </h3>
+            <h3>Health Monitoring</h3>
 
             <p>
-              Access healthcare assistance through
-              a simple and user-friendly platform.
+              Monitor important health information
+              and keep track of your daily wellness.
             </p>
-
           </div>
 
           <div className="card">
+            <div className="icon">🤖</div>
 
-            <div className="icon">
-              🎤
-            </div>
-
-            <h3>
-              Voice Assistance
-            </h3>
+            <h3>MAMA AI</h3>
 
             <p>
-              Use voice-based interaction to make
-              healthcare services easier and faster.
+              Get intelligent assistance for
+              understanding your health information.
             </p>
-
           </div>
 
           <div className="card">
+            <div className="icon">📊</div>
 
-            <div className="icon">
-              🤖
-            </div>
-
-            <h3>
-              AI Assistance
-            </h3>
+            <h3>Health Dashboard</h3>
 
             <p>
-              Get intelligent assistance using
-              modern AI-powered technology.
+              View your health information in one
+              simple dashboard.
             </p>
-
           </div>
 
           <div className="card">
+            <div className="icon">🔒</div>
 
-            <div className="icon">
-              🔒
-            </div>
-
-            <h3>
-              Secure Information
-            </h3>
+            <h3>Secure Access</h3>
 
             <p>
-              Keep important healthcare information
-              organized and protected.
+              Keep your account information protected
+              with secure login and registration.
             </p>
-
           </div>
 
         </div>
-
       </section>
 
-      {/* ==============================
-          ABOUT
-      ============================== */}
-
-      <section
-        className="about"
-        id="about"
-      >
+      <section className="about" id="about">
 
         <div className="about-content">
 
           <p className="small-title">
-            ABOUT US
+            ABOUT MAMA
           </p>
 
           <h2>
-            Your Health,
+            Healthcare
             <br />
-            Our Priority
+            Made Smarter.
           </h2>
 
           <p>
-            MAMA Health Care is a smart healthcare
-            platform designed to make healthcare
-            assistance simple, accessible and
-            technology-driven.
+            MAMA Health Care combines modern web
+            technology with intelligent healthcare
+            assistance.
           </p>
 
-          {!user && (
-            <button
-              className="primary-btn"
-              onClick={() => setPage("login")}
-            >
-              Get Started →
-            </button>
-          )}
+          <button
+            className="primary-btn"
+            onClick={() => setPage("dashboard")}
+          >
+            Open Dashboard
+          </button>
 
         </div>
 
         <div className="about-card">
 
           <div className="big-heart">
-            💙
+            ❤️
           </div>
 
           <h3>
-            Care + Technology
+            Your Health Matters
           </h3>
 
           <p>
-            Making healthcare easier through
-            modern technology.
+            Stay informed. Stay active. Stay healthy.
           </p>
 
         </div>
 
       </section>
 
-      {/* ==============================
-          FOOTER
-      ============================== */}
+      <BackendTest />
 
-      <footer id="contact">
-
-        <h3>
-          ❤️ MAMA Health Care
-        </h3>
+      <footer>
+        <h3>❤️ MAMA Health Care</h3>
 
         <p>
-          Smart Healthcare • Better Care • Better Life
+          Smart healthcare for everyone.
         </p>
 
         <p>
-          © 2026 MAMA Health Care
+          © 2026 MAMA Health Care. All rights reserved.
         </p>
-
       </footer>
 
     </div>
