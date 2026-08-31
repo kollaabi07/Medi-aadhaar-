@@ -1,101 +1,93 @@
 import { useState } from "react";
-import "./components/Login.css";
+import "./Login.css";
 
-function Login({ setPage }) {
+function Login({ onLoginSuccess, onBack }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-    console.log("Login button clicked");
+    setError("");
 
     if (!email || !password) {
-      alert("Please enter email and password");
+      setError("Please enter email and password.");
       return;
     }
 
+    setLoading(true);
+
+    console.log("Login button clicked");
+    console.log("Sending login request...");
+
     try {
-      console.log("Sending login request...");
-
-      const response = await fetch(
-        "http://localhost:5000/api/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password
-          })
-        }
-      );
-
-      console.log(
-        "Server response status:",
-        response.status
-      );
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
 
       const data = await response.json();
 
-      console.log("Server response:", data);
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
 
-      if (response.ok) {
-        alert("Login successful! 🎉");
+      console.log("Login successful:", data);
 
-        console.log(
-          "Logged in user:",
-          data.user
-        );
-
-        // Save logged-in user
-        localStorage.setItem(
-          "loggedInUser",
-          JSON.stringify(data.user)
-        );
-
-        // Go to home page
-        setPage("home");
-
-      } else {
-        alert(
-          data.message || "Login failed"
-        );
+      /*
+       * Send the logged-in user back to App.jsx.
+       * App.jsx will then open the dashboard.
+       */
+      if (onLoginSuccess) {
+        onLoginSuccess(data.user || {
+          name: data.name || "User",
+          email: email.trim(),
+        });
       }
 
     } catch (error) {
-      console.error(
-        "Login error:",
-        error
-      );
-
-      alert(
-        "Unable to connect to server"
-      );
+      console.error("Login error:", error);
+      setError(error.message || "Unable to connect to server.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-page">
+    <div className="login-container">
 
       <div className="login-card">
 
-        <div className="login-logo">
+        <div className="login-icon">
           ❤️
         </div>
 
         <h1>
-          MAMA Health Care
+          Welcome Back
         </h1>
 
         <p className="login-subtitle">
-          Login to your account
+          Login to MAMA Health Care
         </p>
+
+        {error && (
+          <div className="login-error">
+            ❌ {error}
+          </div>
+        )}
 
         <form onSubmit={handleLogin}>
 
           <div className="input-group">
+
             <label>
               Email
             </label>
@@ -104,14 +96,14 @@ function Login({ setPage }) {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
+
           </div>
 
           <div className="input-group">
+
             <label>
               Password
             </label>
@@ -120,47 +112,29 @@ function Login({ setPage }) {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </div>
 
-          <div className="forgot-password">
-            Forgot Password?
           </div>
 
           <button
             type="submit"
-            className="login-button"
+            className="login-submit-btn"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
         </form>
 
-        <div className="divider">
-          <span>OR</span>
-        </div>
-
         <button
-          className="google-button"
+          type="button"
+          className="back-btn"
+          onClick={onBack}
         >
-          🔵 Continue with Google
+          ← Back
         </button>
-
-        <p className="register-text">
-          Don't have an account?
-
-          <span
-            onClick={() =>
-              setPage("register")
-            }
-          >
-            {" "}Register
-          </span>
-        </p>
 
       </div>
 
@@ -169,3 +143,4 @@ function Login({ setPage }) {
 }
 
 export default Login;
+

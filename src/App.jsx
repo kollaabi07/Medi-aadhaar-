@@ -1,28 +1,38 @@
+
 import { useState } from "react";
+
 import Login from "./Login";
 import Register from "./components/Register";
 import BackendTest from "./components/BackendTest";
 import HealthDashboard from "./components/HealthDashboard";
+
+
 import assistantImage from "./assets/healthcare-assistant.jpg";
+
 import "./App.css";
+
 function App() {
   const [page, setPage] = useState("home");
   const [user, setUser] = useState(null);
 
+  // LOGIN
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     setPage("dashboard");
   };
 
+  // LOGOUT
   const handleLogout = () => {
     setUser(null);
     setPage("home");
   };
 
+  // REGISTER
   const handleRegisterSuccess = () => {
     setPage("login");
   };
 
+  // LOGIN PAGE
   if (page === "login") {
     return (
       <div className="app">
@@ -34,6 +44,7 @@ function App() {
     );
   }
 
+  // REGISTER PAGE
   if (page === "register") {
     return (
       <div className="app">
@@ -45,15 +56,22 @@ function App() {
     );
   }
 
-  if (page === "dashboard") {
+  // HEALTH REPORT PAGE
+  if (page === "health-report") {
     return (
       <div className="app">
+
         <nav className="navbar">
-          <div className="logo" onClick={() => setPage("home")}>
+
+          <div
+            className="logo"
+            onClick={() => setPage("home")}
+          >
             ❤️ MAMA <span>Health Care</span>
           </div>
 
           <div className="nav-links">
+
             <a
               href="#"
               onClick={(e) => {
@@ -73,9 +91,85 @@ function App() {
             >
               Dashboard
             </a>
+
           </div>
 
           <div className="user-section">
+
+            <button
+              className="profile-btn"
+              onClick={() => setPage("dashboard")}
+            >
+              Dashboard
+            </button>
+
+            <button
+              className="login-btn"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+
+          </div>
+
+        </nav>
+
+        <HealthReport />
+
+      </div>
+    );
+  }
+
+  // DASHBOARD PAGE
+  if (page === "dashboard") {
+    return (
+      <div className="app">
+
+        <nav className="navbar">
+
+          <div
+            className="logo"
+            onClick={() => setPage("home")}
+          >
+            ❤️ MAMA <span>Health Care</span>
+          </div>
+
+          <div className="nav-links">
+
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setPage("home");
+              }}
+            >
+              Home
+            </a>
+
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setPage("dashboard");
+              }}
+            >
+              Dashboard
+            </a>
+
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setPage("health-report");
+              }}
+            >
+              Health Report
+            </a>
+
+          </div>
+
+          <div className="user-section">
+
             <span className="welcome-user">
               Hi, {user?.name || "User"}
             </span>
@@ -93,24 +187,42 @@ function App() {
             >
               Logout
             </button>
+
           </div>
+
         </nav>
 
-        <HealthDashboard />
+        <HealthDashboard
+          onHealthReport={() => setPage("health-report")}
+        />
 
         <footer>
-          <h3>❤️ MAMA Health Care</h3>
-          <p>Smart healthcare for everyone.</p>
-          <p>© 2026 MAMA Health Care. All rights reserved.</p>
+
+          <h3>
+            ❤️ MAMA Health Care
+          </h3>
+
+          <p>
+            Smart healthcare for everyone.
+          </p>
+
+          <p>
+            © 2026 MAMA Health Care. All rights reserved.
+          </p>
+
         </footer>
+
       </div>
     );
   }
 
+  // PROFILE PAGE
   if (page === "profile") {
     return (
       <div className="app">
+
         <nav className="navbar">
+
           <div
             className="logo"
             onClick={() => setPage("home")}
@@ -119,6 +231,7 @@ function App() {
           </div>
 
           <div className="user-section">
+
             <button
               className="profile-btn"
               onClick={() => setPage("dashboard")}
@@ -132,35 +245,53 @@ function App() {
             >
               Logout
             </button>
+
           </div>
+
         </nav>
 
         <section className="profile-page">
-          <div className="profile-card">
-            <div className="profile-icon">👤</div>
 
-            <h1>My Profile</h1>
+          <div className="profile-card">
+
+            <div className="profile-icon">
+              👤
+            </div>
+
+            <h1>
+              My Profile
+            </h1>
 
             <div className="profile-info">
+
               <p>
                 <strong>Name</strong>
-                <span>{user?.name || "User"}</span>
+                <span>
+                  {user?.name || "User"}
+                </span>
               </p>
 
               <p>
                 <strong>Email</strong>
-                <span>{user?.email || "Not available"}</span>
+                <span>
+                  {user?.email || "Not available"}
+                </span>
               </p>
 
               <p>
                 <strong>Phone</strong>
-                <span>{user?.mobile || "Not available"}</span>
+                <span>
+                  {user?.mobile || "Not available"}
+                </span>
               </p>
 
               <p>
                 <strong>Status</strong>
-                <span>Active</span>
+                <span>
+                  Active
+                </span>
               </p>
+
             </div>
 
             <button
@@ -169,16 +300,23 @@ function App() {
             >
               Health Dashboard
             </button>
+
           </div>
+
         </section>
+
       </div>
     );
   }
 
+  // HOME PAGE
   return (
     <div className="app">
 
+      {/* NAVBAR */}
+
       <nav className="navbar">
+
         <div
           className="logo"
           onClick={() => setPage("home")}
@@ -187,12 +325,23 @@ function App() {
         </div>
 
         <div className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#services">Services</a>
-          <a href="#about">About</a>
+
+          <a href="#home">
+            Home
+          </a>
+
+          <a href="#services">
+            Services
+          </a>
+
+          <a href="#about">
+            About
+          </a>
+
         </div>
 
         <div className="user-section">
+
           {user ? (
             <>
               <span className="welcome-user">
@@ -230,10 +379,17 @@ function App() {
               </button>
             </>
           )}
+
         </div>
+
       </nav>
 
-      <section className="hero" id="home">
+      {/* HERO */}
+
+      <section
+        className="hero"
+        id="home"
+      >
 
         <div className="hero-content">
 
@@ -254,7 +410,9 @@ function App() {
           <h1>
             Smart Healthcare
             <br />
-            <span>For Everyone</span>
+            <span>
+              For Everyone
+            </span>
           </h1>
 
           <p className="description">
@@ -265,6 +423,7 @@ function App() {
           </p>
 
           <div className="buttons">
+
             <button
               className="primary-btn"
               onClick={() => setPage("dashboard")}
@@ -272,70 +431,105 @@ function App() {
               View Health Dashboard
             </button>
 
-            {!user && (
-              <button
-                className="secondary-btn"
-                onClick={() => setPage("register")}
-              >
-                Get Started
-              </button>
-            )}
+            <button
+              className="secondary-btn"
+              onClick={() => setPage("health-report")}
+            >
+              📋 Health Report
+            </button>
+
           </div>
 
         </div>
 
+        {/* 3D HERO */}
+
         <div className="hero-right">
+
           <div className="health-3d-scene">
 
             <div className="health-orb">
+
               <div className="health-orb-inner">
                 ❤️
               </div>
+
             </div>
 
             <div className="health-card heart-rate-card">
+
               <div className="health-card-icon">
                 ❤️
               </div>
 
               <div>
-                <small>Heart Rate</small>
-                <h3>72 BPM</h3>
+
+                <small>
+                  Heart Rate
+                </small>
+
+                <h3>
+                  72 BPM
+                </h3>
+
               </div>
+
             </div>
 
             <div className="health-card hydration-card">
+
               <div className="health-card-icon">
                 💧
               </div>
 
               <div>
-                <small>Hydration</small>
-                <h3>85%</h3>
+
+                <small>
+                  Hydration
+                </small>
+
+                <h3>
+                  85%
+                </h3>
+
               </div>
+
             </div>
 
             <div className="health-card score-card">
+
               <div className="health-card-icon">
                 ⭐
               </div>
 
               <div>
-                <small>Health Score</small>
-                <h3>94%</h3>
+
+                <small>
+                  Health Score
+                </small>
+
+                <h3>
+                  94%
+                </h3>
+
               </div>
+
             </div>
 
             <div className="health-center-card">
 
               <div className="doctor-small">
+
                 <img
                   src={assistantImage}
                   alt="MAMA Health Assistant"
                 />
+
               </div>
 
-              <h3>MAMA AI</h3>
+              <h3>
+                MAMA AI
+              </h3>
 
               <p>
                 Your smart health assistant
@@ -348,13 +542,21 @@ function App() {
             </div>
 
           </div>
+
         </div>
 
       </section>
 
-      <section className="services" id="services">
+      {/* SERVICES */}
 
-        <h2>Smart Health Services</h2>
+      <section
+        className="services"
+        id="services"
+      >
+
+        <h2>
+          Smart Health Services
+        </h2>
 
         <p className="section-description">
           Technology-powered healthcare tools
@@ -365,53 +567,83 @@ function App() {
         <div className="cards">
 
           <div className="card">
-            <div className="icon">❤️</div>
 
-            <h3>Health Monitoring</h3>
+            <div className="icon">
+              ❤️
+            </div>
+
+            <h3>
+              Health Monitoring
+            </h3>
 
             <p>
               Monitor important health information
               and keep track of your daily wellness.
             </p>
+
           </div>
 
           <div className="card">
-            <div className="icon">🤖</div>
 
-            <h3>MAMA AI</h3>
+            <div className="icon">
+              🤖
+            </div>
+
+            <h3>
+              MAMA AI
+            </h3>
 
             <p>
               Get intelligent assistance for
               understanding your health information.
             </p>
+
           </div>
 
           <div className="card">
-            <div className="icon">📊</div>
 
-            <h3>Health Dashboard</h3>
+            <div className="icon">
+              📊
+            </div>
+
+            <h3>
+              Health Dashboard
+            </h3>
 
             <p>
               View your health information in one
               simple dashboard.
             </p>
+
           </div>
 
           <div className="card">
-            <div className="icon">🔒</div>
 
-            <h3>Secure Access</h3>
+            <div className="icon">
+              📋
+            </div>
+
+            <h3>
+              Health Report
+            </h3>
 
             <p>
-              Keep your account information protected
-              with secure login and registration.
+              Calculate BMI and view basic health
+              information and lifestyle tips.
             </p>
+
           </div>
 
         </div>
+
       </section>
 
-      <section className="about" id="about">
+      {/* ABOUT */}
+
+      <section
+        className="about"
+        id="about"
+      >
 
         <div className="about-content">
 
@@ -433,9 +665,9 @@ function App() {
 
           <button
             className="primary-btn"
-            onClick={() => setPage("dashboard")}
+            onClick={() => setPage("health-report")}
           >
-            Open Dashboard
+            Open Health Report
           </button>
 
         </div>
@@ -458,18 +690,27 @@ function App() {
 
       </section>
 
+      {/* BACKEND */}
+
       <BackendTest />
 
+      {/* FOOTER */}
+
       <footer>
-        <h3>❤️ MAMA Health Care</h3>
+
+        <h3>
+          ❤️ MAMA Health Care
+        </h3>
 
         <p>
           Smart healthcare for everyone.
         </p>
 
         <p>
-          © 2026 MAMA Health Care. All rights reserved.
+          © 2026 MAMA Health Care.
+          All rights reserved.
         </p>
+
       </footer>
 
     </div>
