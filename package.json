@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mongoose": "^9.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

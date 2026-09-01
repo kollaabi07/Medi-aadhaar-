@@ -1,4 +1,3 @@
-```jsx
 import { useState } from "react";
 import "./HealthReport.css";
 
@@ -24,42 +23,49 @@ function HealthReport() {
     setBmi(result.toFixed(1));
 
     if (result < 18.5) {
-      setMessage("Underweight — consider a balanced nutritious diet.");
+      setMessage(
+        "Underweight - consider a balanced and nutritious diet."
+      );
     } else if (result < 25) {
-      setMessage("Normal weight — keep maintaining a healthy lifestyle.");
+      setMessage(
+        "Normal weight - keep maintaining a healthy lifestyle."
+      );
     } else if (result < 30) {
-      setMessage("Overweight — regular exercise and balanced meals may help.");
+      setMessage(
+        "Overweight - regular exercise and balanced meals may help."
+      );
     } else {
-      setMessage("Obesity range — consider discussing your health with a professional.");
+      setMessage(
+        "Obesity range - consider discussing your health with a professional."
+      );
     }
   };
 
   return (
     <section className="health-report">
 
+      {/* Header */}
       <div className="report-header">
         <p>SMART HEALTH ANALYSIS</p>
 
-        <h1>
-          Personal Health Report
-        </h1>
+        <h1>Personal Health Report</h1>
 
         <span>
           Check your BMI and understand your basic health information.
         </span>
       </div>
 
+      {/* BMI Section */}
       <div className="report-container">
 
+        {/* Calculator Card */}
         <div className="bmi-card">
 
           <div className="report-icon">
-            ⚖️
+            {"\u2696\uFE0F"}
           </div>
 
-          <h2>
-            BMI Calculator
-          </h2>
+          <h2>BMI Calculator</h2>
 
           <p>
             Enter your height and weight to calculate your BMI.
@@ -67,9 +73,7 @@ function HealthReport() {
 
           <div className="input-group">
 
-            <label>
-              Height (cm)
-            </label>
+            <label>Height (cm)</label>
 
             <input
               type="number"
@@ -82,9 +86,7 @@ function HealthReport() {
 
           <div className="input-group">
 
-            <label>
-              Weight (kg)
-            </label>
+            <label>Weight (kg)</label>
 
             <input
               type="number"
@@ -104,21 +106,18 @@ function HealthReport() {
 
         </div>
 
+        {/* Result Card */}
         <div className="result-card">
 
           <div className="result-orb">
-            ❤️
+            {"\u2764\uFE0F"}
           </div>
 
-          <p>
-            YOUR BMI
-          </p>
+          <p>YOUR BMI</p>
 
           {bmi ? (
             <>
-              <h2>
-                {bmi}
-              </h2>
+              <h2>{bmi}</h2>
 
               <div className="bmi-status">
                 {Number(bmi) < 18.5
@@ -136,9 +135,7 @@ function HealthReport() {
             </>
           ) : (
             <>
-              <h2>
-                --
-              </h2>
+              <h2>--</h2>
 
               <span className="health-message">
                 Enter your details to see your result.
@@ -150,16 +147,17 @@ function HealthReport() {
 
       </div>
 
+      {/* Healthy Tips */}
       <div className="health-tips">
 
         <h2>
-          💡 Healthy Lifestyle Tips
+          {"\uD83D\uDCA1"} Healthy Lifestyle Tips
         </h2>
 
         <div className="tips-grid">
 
           <div className="tip">
-            <span>💧</span>
+            <span>{"\uD83D\uDCA7"}</span>
             <h3>Stay Hydrated</h3>
             <p>
               Drink enough water throughout the day.
@@ -167,7 +165,7 @@ function HealthReport() {
           </div>
 
           <div className="tip">
-            <span>🏃</span>
+            <span>{"\uD83C\uDFC3"}</span>
             <h3>Stay Active</h3>
             <p>
               Include regular physical activity in your routine.
@@ -175,7 +173,7 @@ function HealthReport() {
           </div>
 
           <div className="tip">
-            <span>🥗</span>
+            <span>{"\uD83E\uDD57"}</span>
             <h3>Eat Balanced</h3>
             <p>
               Choose a variety of nutritious foods.
@@ -183,7 +181,7 @@ function HealthReport() {
           </div>
 
           <div className="tip">
-            <span>😴</span>
+            <span>{"\uD83D\uDE34"}</span>
             <h3>Sleep Well</h3>
             <p>
               Give your body enough time to rest.
@@ -199,4 +197,4 @@ function HealthReport() {
 }
 
 export default HealthReport;
-```
+

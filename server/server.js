@@ -1,24 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const User = require("./models/User");
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import User from "./models/User.js";
 
 const app = express();
-
 const PORT = 5000;
-
-// ===============================
-// MIDDLEWARE
-// ===============================
 
 app.use(cors());
 app.use(express.json());
 
-// ===============================
-// MONGODB CONNECTION
-// ===============================
-
+// MongoDB
 mongoose
   .connect("mongodb://127.0.0.1:27017/mama_health_care")
   .then(() => {
@@ -28,39 +20,23 @@ mongoose
     console.log("MongoDB connection failed:", error);
   });
 
-// ===============================
-// HOME TEST
-// ===============================
-
+// Test
 app.get("/", (req, res) => {
   res.json({
     message: "MAMA Health Care Backend is running",
-    status: "success"
+    status: "success",
   });
 });
 
-// ===============================
-// REGISTER
-// ===============================
-
+// Register
 app.post("/api/register", async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      mobile,
-      password
-    } = req.body;
-
-    console.log("New Registration:");
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Mobile:", mobile);
+    const { name, email, mobile, password } = req.body;
 
     if (!name || !email || !mobile || !password) {
       return res.status(400).json({
         message: "All fields are required",
-        status: "error"
+        status: "error",
       });
     }
 
@@ -69,86 +45,71 @@ app.post("/api/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         message: "Email already registered",
-        status: "error"
+        status: "error",
       });
     }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-const newUser = new User({
-  name,
-  email,
-  mobile,
-  password: hashedPassword
-});
+    const newUser = new User({
+      name,
+      email,
+      mobile,
+      password: hashedPassword,
+    });
 
-await newUser.save();
+    await newUser.save();
 
-    console.log("User saved successfully");
+    console.log("User registered:", email);
 
     res.status(201).json({
       message: "Registration successful!",
-      status: "success"
+      status: "success",
     });
-
   } catch (error) {
     console.log("Registration error:", error);
 
     res.status(500).json({
       message: "Server error",
-      status: "error"
+      status: "error",
     });
   }
 });
 
-// ===============================
-// LOGIN
-// ===============================
-
+// Login
 app.post("/api/login", async (req, res) => {
   try {
+    const { email, password } = req.body;
 
-    const {
-      email,
-      password
-    } = req.body;
-
-    console.log("Login Request:");
-    console.log("Email:", email);
+    console.log("Login Request:", email);
 
     if (!email || !password) {
       return res.status(400).json({
         message: "Email and password are required",
-        status: "error"
+        status: "error",
       });
     }
 
-    const user = await User.findOne({
-      email: email
-    });
+    const user = await User.findOne({ email });
 
     if (!user) {
-      console.log("User not found");
-
       return res.status(401).json({
         message: "User not found",
-        status: "error"
+        status: "error",
       });
     }
 
-   const passwordMatch = await bcrypt.compare(
-  password,
-  user.password
-);
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
 
-if (!passwordMatch) {
-  console.log("Incorrect password");
-
-  return res.status(401).json({
-    message: "Incorrect password",
-    status: "error"
-  });
-}
+    if (!passwordMatch) {
+      return res.status(401).json({
+        message: "Incorrect password",
+        status: "error",
+      });
+    }
 
     console.log("Login successful for:", email);
 
@@ -158,27 +119,20 @@ if (!passwordMatch) {
       user: {
         name: user.name,
         email: user.email,
-        mobile: user.mobile
-      }
+        mobile: user.mobile,
+      },
     });
-
   } catch (error) {
-
     console.log("Login error:", error);
 
     res.status(500).json({
       message: "Server error",
-      status: "error"
+      status: "error",
     });
   }
 });
 
-// ===============================
-// START SERVER
-// ===============================
-
+// Start server
 app.listen(PORT, () => {
-  console.log(
-    `MAMA Health Care Server running on port ${PORT}`
-  );
+  console.log(`MAMA Health Care Server running on port ${PORT}`);
 });
