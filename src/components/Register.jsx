@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./Register.css";
 
-function Register({ setPage }) {
+function Register({ onRegisterSuccess, onBack }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -46,7 +46,7 @@ function Register({ setPage }) {
         setPassword("");
         setConfirmPassword("");
 
-        setPage("login");
+        onRegisterSuccess();
       } else {
         alert(data.message || "Registration failed");
       }
@@ -145,11 +145,19 @@ function Register({ setPage }) {
 
         </form>
 
+        <button
+          type="button"
+          className="back-btn"
+          onClick={onBack}
+        >
+          Back
+        </button>
+
 
         <p className="login-text">
           Already have an account?
 
-          <span onClick={() => setPage("login")}>
+          <span onClick={onBack}>
             {" "}Login
           </span>
         </p>

@@ -5,6 +5,7 @@ import Login from "./Login";
 import Register from "./components/Register";
 import BackendTest from "./components/BackendTest";
 import HealthDashboard from "./components/HealthDashboard";
+import HealthReport from "./components/HealthReport";
 
 
 import assistantImage from "./assets/healthcare-assistant.jpg";

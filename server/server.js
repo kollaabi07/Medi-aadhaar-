@@ -7,20 +7,21 @@ import User from "./models/User.js";
 const app = express();
 const PORT = 5000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB
+// MongoDB Connection
 mongoose
   .connect("mongodb://127.0.0.1:27017/mama_health_care")
   .then(() => {
-    console.log("MongoDB connected successfully");
+    console.log("MongoDB connected successfully ✅");
   })
   .catch((error) => {
-    console.log("MongoDB connection failed:", error);
+    console.log("MongoDB connection failed ❌:", error);
   });
 
-// Test
+// Test Route
 app.get("/", (req, res) => {
   res.json({
     message: "MAMA Health Care Backend is running",
@@ -28,10 +29,12 @@ app.get("/", (req, res) => {
   });
 });
 
-// Register
+// REGISTER
 app.post("/api/register", async (req, res) => {
   try {
     const { name, email, mobile, password } = req.body;
+
+    console.log("Register Request:", email);
 
     if (!name || !email || !mobile || !password) {
       return res.status(400).json({
@@ -76,7 +79,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// Login
+// LOGIN
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -132,7 +135,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// Start server
+// START SERVER
 app.listen(PORT, () => {
-  console.log(`MAMA Health Care Server running on port ${PORT}`);
+  console.log(`MAMA Health Care Server running on port ${PORT} 🚀`);
 });
