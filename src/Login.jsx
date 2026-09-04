@@ -23,39 +23,66 @@ function Login({ onLoginSuccess, onBack }) {
     console.log("Sending login request...");
 
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          password: password,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/login",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            email: email.trim(),
+            password: password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        throw new Error(
+          data.message || "Login failed"
+        );
       }
 
-      console.log("Login successful:", data);
+      console.log(
+        "Login successful:",
+        data
+      );
 
-      /*
-       * Send the logged-in user back to App.jsx.
-       * App.jsx will then open the dashboard.
-       */
+      // Save logged-in user
+      const loggedInUser = data.user || {
+        name: data.name || "User",
+        email: email.trim(),
+      };
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(loggedInUser)
+      );
+
+      console.log(
+        "User saved to localStorage:",
+        loggedInUser
+      );
+
+      // Send user to App.jsx
       if (onLoginSuccess) {
-        onLoginSuccess(data.user || {
-          name: data.name || "User",
-          email: email.trim(),
-        });
+        onLoginSuccess(loggedInUser);
       }
 
     } catch (error) {
-      console.error("Login error:", error);
-      setError(error.message || "Unable to connect to server.");
+      console.error(
+        "Login error:",
+        error
+      );
+
+      setError(
+        error.message ||
+        "Unable to connect to server."
+      );
     } finally {
       setLoading(false);
     }
@@ -96,7 +123,9 @@ function Login({ onLoginSuccess, onBack }) {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
               required
             />
 
@@ -112,7 +141,9 @@ function Login({ onLoginSuccess, onBack }) {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               required
             />
 
@@ -123,7 +154,9 @@ function Login({ onLoginSuccess, onBack }) {
             className="login-submit-btn"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading
+              ? "Logging in..."
+              : "Login"}
           </button>
 
         </form>
@@ -143,4 +176,3 @@ function Login({ onLoginSuccess, onBack }) {
 }
 
 export default Login;
-
