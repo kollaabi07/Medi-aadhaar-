@@ -42,8 +42,7 @@ mongoose
 
 app.get("/", (req, res) => {
   res.json({
-    message:
-      "MAMA Health Care Backend is running",
+    message: "MAMA Health Care Backend is running",
     status: "success",
   });
 });
@@ -61,10 +60,7 @@ app.post("/api/register", async (req, res) => {
       password,
     } = req.body;
 
-    console.log(
-      "Register Request:",
-      email
-    );
+    console.log("Register Request:", email);
 
     if (
       !name ||
@@ -78,15 +74,17 @@ app.post("/api/register", async (req, res) => {
       });
     }
 
+    const cleanEmail =
+      email.trim().toLowerCase();
+
     const existingUser =
       await User.findOne({
-        email: email.toLowerCase(),
+        email: cleanEmail,
       });
 
     if (existingUser) {
       return res.status(400).json({
-        message:
-          "Email already registered",
+        message: "Email already registered",
         status: "error",
       });
     }
@@ -95,9 +93,9 @@ app.post("/api/register", async (req, res) => {
       await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      name,
-      email: email.toLowerCase(),
-      mobile,
+      name: name.trim(),
+      email: cleanEmail,
+      mobile: mobile.trim(),
       password: hashedPassword,
     });
 
@@ -105,12 +103,11 @@ app.post("/api/register", async (req, res) => {
 
     console.log(
       "User registered:",
-      email
+      cleanEmail
     );
 
     res.status(201).json({
-      message:
-        "Registration successful!",
+      message: "Registration successful!",
       status: "success",
     });
   } catch (error) {
@@ -137,10 +134,7 @@ app.post("/api/login", async (req, res) => {
       password,
     } = req.body;
 
-    console.log(
-      "Login Request:",
-      email
-    );
+    console.log("Login Request:", email);
 
     if (!email || !password) {
       return res.status(400).json({
@@ -150,9 +144,12 @@ app.post("/api/login", async (req, res) => {
       });
     }
 
+    const cleanEmail =
+      email.trim().toLowerCase();
+
     const user =
       await User.findOne({
-        email: email.toLowerCase(),
+        email: cleanEmail,
       });
 
     if (!user) {
@@ -177,12 +174,11 @@ app.post("/api/login", async (req, res) => {
 
     console.log(
       "Login successful for:",
-      email
+      cleanEmail
     );
 
     res.status(200).json({
-      message:
-        "Login successful!",
+      message: "Login successful!",
       status: "success",
 
       user: {
@@ -241,10 +237,10 @@ app.post(
 
       const report =
         new HealthReport({
-          email: email.toLowerCase(),
-          height,
-          weight,
-          bmi,
+          email: email.trim().toLowerCase(),
+          height: Number(height),
+          weight: Number(weight),
+          bmi: Number(bmi),
           category,
         });
 
@@ -276,45 +272,83 @@ app.post(
 );
 
 // =========================
-// GET HEALTH REPORT
+// GET ALL HEALTH REPORTS
 // =========================
 
 app.get(
-  "/api/health-report/:email",
+  "/api/health-reports/:email",
   async (req, res) => {
     try {
       const email =
-        req.params.email.toLowerCase();
+        req.params.email
+          .trim()
+          .toLowerCase();
 
       console.log(
-        "Getting health report:",
+        "Getting health history:",
         email
       );
 
-      const report =
-        await HealthReport.findOne({
+      const reports =
+        await HealthReport.find({
           email,
         }).sort({
           createdAt: -1,
         });
 
+      res.status(200).json({
+        message:
+          "Health history retrieved successfully",
+        status: "success",
+        reports,
+      });
+    } catch (error) {
+      console.log(
+        "Health history error:",
+        error
+      );
+
+      res.status(500).json({
+        message: "Server error",
+        status: "error",
+      });
+    }
+  }
+);
+
+// =========================
+// DELETE ONE HEALTH REPORT
+// =========================
+
+app.delete(
+  "/api/health-report/:id",
+  async (req, res) => {
+    try {
+      const report =
+        await HealthReport.findByIdAndDelete(
+          req.params.id
+        );
+
       if (!report) {
         return res.status(404).json({
-          message:
-            "No health report found",
+          message: "Report not found",
           status: "error",
         });
       }
 
+      console.log(
+        "Health report deleted:",
+        req.params.id
+      );
+
       res.status(200).json({
         message:
-          "Health report found",
+          "Health report deleted successfully",
         status: "success",
-        report,
       });
     } catch (error) {
       console.log(
-        "Get health report error:",
+        "Delete report error:",
         error
       );
 

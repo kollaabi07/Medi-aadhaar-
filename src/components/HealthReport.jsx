@@ -2,28 +2,23 @@ import { useEffect, useState } from "react";
 import "./HealthReport.css";
 
 function HealthReport() {
-  const [height, setHeight] =
-    useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
 
-  const [weight, setWeight] =
-    useState("");
+  const [bmi, setBmi] = useState(null);
+  const [category, setCategory] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [bmi, setBmi] =
-    useState(null);
+  const [saving, setSaving] = useState(false);
+  const [savedMessage, setSavedMessage] = useState("");
 
-  const [message, setMessage] =
-    useState("");
+  const [userEmail, setUserEmail] = useState("");
 
-  const [category, setCategory] =
-    useState("");
-
-  const [saving, setSaving] =
+  const [reports, setReports] = useState([]);
+  const [loadingHistory, setLoadingHistory] =
     useState(false);
 
-  const [savedMessage, setSavedMessage] =
-    useState("");
-
-  const [userEmail, setUserEmail] =
+  const [historyError, setHistoryError] =
     useState("");
 
   // =========================
@@ -52,6 +47,59 @@ function HealthReport() {
   }, []);
 
   // =========================
+  // LOAD HEALTH HISTORY
+  // =========================
+
+  useEffect(() => {
+    if (userEmail) {
+      loadHealthHistory();
+    }
+  }, [userEmail]);
+
+  const loadHealthHistory = async () => {
+    if (!userEmail) {
+      return;
+    }
+
+    try {
+      setLoadingHistory(true);
+      setHistoryError("");
+
+      const response =
+        await fetch(
+          `http://localhost:5000/api/health-reports/${encodeURIComponent(
+            userEmail
+          )}`
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Failed to load history"
+        );
+      }
+
+      setReports(
+        data.reports || []
+      );
+    } catch (error) {
+      console.log(
+        "Health history error:",
+        error
+      );
+
+      setHistoryError(
+        "Unable to load health history."
+      );
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  // =========================
   // CALCULATE BMI
   // =========================
 
@@ -61,7 +109,6 @@ function HealthReport() {
 
     setSavedMessage("");
 
-    // Validation
     if (
       !h ||
       !w ||
@@ -78,7 +125,6 @@ function HealthReport() {
       return;
     }
 
-    // BMI calculation
     const heightInMeters =
       h / 100;
 
@@ -88,14 +134,11 @@ function HealthReport() {
         heightInMeters);
 
     const finalBMI =
-      Number(
-        result.toFixed(1)
-      );
+      Number(result.toFixed(1));
 
     let finalCategory = "";
     let healthMessage = "";
 
-    // BMI category
     if (result < 18.5) {
       finalCategory =
         "Underweight";
@@ -127,7 +170,7 @@ function HealthReport() {
     setMessage(healthMessage);
 
     // =========================
-    // SAVE TO MONGODB
+    // SAVE TO DATABASE
     // =========================
 
     if (!userEmail) {
@@ -176,6 +219,9 @@ function HealthReport() {
       setSavedMessage(
         "✅ Health report saved successfully!"
       );
+
+      // Refresh history
+      loadHealthHistory();
     } catch (error) {
       console.log(
         "Save health report error:",
@@ -188,6 +234,70 @@ function HealthReport() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // =========================
+  // DELETE REPORT
+  // =========================
+
+  const deleteReport = async (id) => {
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete this health report?"
+      );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const response =
+        await fetch(
+          `http://localhost:5000/api/health-report/${id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Failed to delete report"
+        );
+      }
+
+      setReports((previousReports) =>
+        previousReports.filter(
+          (report) =>
+            report._id !== id
+        )
+      );
+    } catch (error) {
+      console.log(
+        "Delete error:",
+        error
+      );
+
+      alert(
+        "Unable to delete report."
+      );
+    }
+  };
+
+  // =========================
+  // DATE FORMAT
+  // =========================
+
+  const formatDate = (date) => {
+    return new Date(
+      date
+    ).toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
   };
 
   return (
@@ -233,8 +343,6 @@ function HealthReport() {
             to calculate your BMI.
           </p>
 
-          {/* HEIGHT */}
-
           <div className="input-group">
 
             <label>
@@ -253,8 +361,6 @@ function HealthReport() {
             />
 
           </div>
-
-          {/* WEIGHT */}
 
           <div className="input-group">
 
@@ -275,8 +381,6 @@ function HealthReport() {
 
           </div>
 
-          {/* BUTTON */}
-
           <button
             className="calculate-btn"
             onClick={calculateBMI}
@@ -286,8 +390,6 @@ function HealthReport() {
               ? "Saving..."
               : "Calculate BMI"}
           </button>
-
-          {/* SAVE MESSAGE */}
 
           {savedMessage && (
             <p className="saved-message">
@@ -337,6 +439,119 @@ function HealthReport() {
           )}
 
         </div>
+
+      </div>
+
+      {/* =========================
+          HEALTH HISTORY
+          ========================= */}
+
+      <div className="health-history">
+
+        <div className="history-header">
+
+          <h2>
+            📋 Health History
+          </h2>
+
+          <button
+            onClick={loadHealthHistory}
+            disabled={loadingHistory}
+          >
+            {loadingHistory
+              ? "Loading..."
+              : "Refresh"}
+          </button>
+
+        </div>
+
+        {historyError && (
+          <p className="history-error">
+            ❌ {historyError}
+          </p>
+        )}
+
+        {loadingHistory ? (
+          <div className="history-empty">
+            Loading your health history...
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="history-empty">
+            <div className="empty-icon">
+              📊
+            </div>
+
+            <h3>
+              No Health Reports Yet
+            </h3>
+
+            <p>
+              Calculate your BMI to create
+              your first health report.
+            </p>
+          </div>
+        ) : (
+          <div className="history-list">
+
+            {reports.map(
+              (report, index) => (
+                <div
+                  className="history-card"
+                  key={report._id}
+                >
+
+                  <div className="history-number">
+                    #{reports.length - index}
+                  </div>
+
+                  <div className="history-info">
+
+                    <h3>
+                      BMI: {report.bmi}
+                    </h3>
+
+                    <span
+                      className="history-category"
+                    >
+                      {report.category}
+                    </span>
+
+                    <p>
+                      📏 Height:{" "}
+                      {report.height} cm
+                    </p>
+
+                    <p>
+                      ⚖️ Weight:{" "}
+                      {report.weight} kg
+                    </p>
+
+                    <small>
+                      🕒{" "}
+                      {formatDate(
+                        report.createdAt
+                      )}
+                    </small>
+
+                  </div>
+
+                  <button
+                    className="delete-report-btn"
+                    onClick={() =>
+                      deleteReport(
+                        report._id
+                      )
+                    }
+                  >
+                    🗑️ Delete
+                  </button>
+
+                </div>
+              )
+            )}
+
+          </div>
+        )}
 
       </div>
 
