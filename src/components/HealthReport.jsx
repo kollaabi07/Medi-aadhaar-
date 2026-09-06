@@ -220,8 +220,8 @@ function HealthReport() {
         "✅ Health report saved successfully!"
       );
 
-      // Refresh history
-      loadHealthHistory();
+      await loadHealthHistory();
+
     } catch (error) {
       console.log(
         "Save health report error:",
@@ -269,12 +269,14 @@ function HealthReport() {
         );
       }
 
-      setReports((previousReports) =>
-        previousReports.filter(
-          (report) =>
-            report._id !== id
-        )
+      setReports(
+        (previousReports) =>
+          previousReports.filter(
+            (report) =>
+              report._id !== id
+          )
       );
+
     } catch (error) {
       console.log(
         "Delete error:",
@@ -298,6 +300,90 @@ function HealthReport() {
       dateStyle: "medium",
       timeStyle: "short",
     });
+  };
+
+  // =========================
+  // BMI TREND CALCULATIONS
+  // =========================
+
+  const getBMIChange = () => {
+    if (reports.length < 2) {
+      return null;
+    }
+
+    const latest =
+      Number(reports[0].bmi);
+
+    const previous =
+      Number(reports[1].bmi);
+
+    return Number(
+      (latest - previous).toFixed(1)
+    );
+  };
+
+  const bmiChange =
+    getBMIChange();
+
+  const getTrendText = () => {
+    if (bmiChange === null) {
+      return "Not enough data to calculate your BMI trend.";
+    }
+
+    if (bmiChange > 0) {
+      return `Your BMI increased by ${bmiChange} compared with your previous report.`;
+    }
+
+    if (bmiChange < 0) {
+      return `Your BMI decreased by ${Math.abs(
+        bmiChange
+      )} compared with your previous report.`;
+    }
+
+    return "Your BMI is unchanged from your previous report.";
+  };
+
+  const getTrendIcon = () => {
+    if (bmiChange === null) {
+      return "📊";
+    }
+
+    if (bmiChange > 0) {
+      return "📈";
+    }
+
+    if (bmiChange < 0) {
+      return "📉";
+    }
+
+    return "➡️";
+  };
+
+  // =========================
+  // BMI RANGE POSITION
+  // =========================
+
+  const getBMIPosition = (value) => {
+    const numericBMI =
+      Number(value);
+
+    const min = 15;
+    const max = 40;
+
+    let position =
+      ((numericBMI - min) /
+        (max - min)) *
+      100;
+
+    if (position < 0) {
+      position = 0;
+    }
+
+    if (position > 100) {
+      position = 100;
+    }
+
+    return position;
   };
 
   return (
@@ -443,6 +529,305 @@ function HealthReport() {
       </div>
 
       {/* =========================
+          BMI TREND
+          ========================= */}
+
+      <div className="bmi-trend">
+
+        <div className="trend-header">
+
+          <div>
+            <p>
+              HEALTH ANALYTICS
+            </p>
+
+            <h2>
+              📊 BMI Trend
+            </h2>
+          </div>
+
+          <div className="trend-count">
+            {reports.length}{" "}
+            {reports.length === 1
+              ? "Report"
+              : "Reports"}
+          </div>
+
+        </div>
+
+        {reports.length === 0 ? (
+
+          <div className="trend-empty">
+
+            <div>
+              📊
+            </div>
+
+            <h3>
+              Your BMI Trend Will Appear Here
+            </h3>
+
+            <p>
+              Calculate your BMI to start
+              tracking your progress.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <>
+
+            {/* CURRENT BMI */}
+
+            <div className="trend-summary">
+
+              <div className="trend-summary-card">
+
+                <span>
+                  Latest BMI
+                </span>
+
+                <strong>
+                  {reports[0].bmi}
+                </strong>
+
+                <small>
+                  {reports[0].category}
+                </small>
+
+              </div>
+
+              <div className="trend-summary-card">
+
+                <span>
+                  Previous BMI
+                </span>
+
+                <strong>
+                  {reports.length > 1
+                    ? reports[1].bmi
+                    : "--"}
+                </strong>
+
+                <small>
+                  {reports.length > 1
+                    ? reports[1].category
+                    : "No previous report"}
+                </small>
+
+              </div>
+
+              <div className="trend-summary-card">
+
+                <span>
+                  BMI Change
+                </span>
+
+                <strong>
+                  {bmiChange === null
+                    ? "--"
+                    : bmiChange > 0
+                    ? `+${bmiChange}`
+                    : bmiChange}
+                </strong>
+
+                <small>
+                  {getTrendIcon()}{" "}
+                  {bmiChange === null
+                    ? "Need more data"
+                    : "Since previous report"}
+                </small>
+
+              </div>
+
+            </div>
+
+            {/* BMI SCALE */}
+
+            <div className="bmi-scale-section">
+
+              <h3>
+                BMI Range
+              </h3>
+
+              <div className="bmi-scale">
+
+                <div className="scale-track">
+
+                  <div
+                    className="scale-marker"
+                    style={{
+                      left: `${getBMIPosition(
+                        reports[0].bmi
+                      )}%`,
+                    }}
+                  >
+                    <span>
+                      {reports[0].bmi}
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="scale-labels">
+
+                  <span>
+                    15
+                  </span>
+
+                  <span>
+                    18.5
+                  </span>
+
+                  <span>
+                    25
+                  </span>
+
+                  <span>
+                    30
+                  </span>
+
+                  <span>
+                    40
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div className="scale-categories">
+
+                <span>
+                  Underweight
+                </span>
+
+                <span>
+                  Normal
+                </span>
+
+                <span>
+                  Overweight
+                </span>
+
+                <span>
+                  Obesity
+                </span>
+
+              </div>
+
+            </div>
+
+            {/* TREND MESSAGE */}
+
+            <div className="trend-message">
+
+              <span>
+                {getTrendIcon()}
+              </span>
+
+              <div>
+                <h3>
+                  BMI Progress
+                </h3>
+
+                <p>
+                  {getTrendText()}
+                </p>
+              </div>
+
+            </div>
+
+            {/* SIMPLE CHART */}
+
+            <div className="trend-chart">
+
+              <h3>
+                BMI History Chart
+              </h3>
+
+              <div className="chart-area">
+
+                {reports
+                  .slice()
+                  .reverse()
+                  .map(
+                    (report, index) => {
+
+                      const chartBMI =
+                        Number(
+                          report.bmi
+                        );
+
+                      const minBMI = 15;
+                      const maxBMI = 40;
+
+                      let heightPercent =
+                        ((chartBMI -
+                          minBMI) /
+                          (maxBMI -
+                            minBMI)) *
+                        100;
+
+                      if (
+                        heightPercent < 10
+                      ) {
+                        heightPercent = 10;
+                      }
+
+                      if (
+                        heightPercent > 100
+                      ) {
+                        heightPercent = 100;
+                      }
+
+                      return (
+                        <div
+                          className="chart-column"
+                          key={
+                            report._id
+                          }
+                        >
+
+                          <div className="chart-value">
+                            {report.bmi}
+                          </div>
+
+                          <div
+                            className="chart-bar"
+                            style={{
+                              height: `${heightPercent}%`,
+                            }}
+                          />
+
+                          <small>
+                            {new Date(
+                              report.createdAt
+                            ).toLocaleDateString(
+                              "en-IN",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                              }
+                            )}
+                          </small>
+
+                        </div>
+                      );
+                    }
+                  )}
+
+              </div>
+
+            </div>
+
+          </>
+
+        )}
+
+      </div>
+
+      {/* =========================
           HEALTH HISTORY
           ========================= */}
 
@@ -472,11 +857,15 @@ function HealthReport() {
         )}
 
         {loadingHistory ? (
+
           <div className="history-empty">
             Loading your health history...
           </div>
+
         ) : reports.length === 0 ? (
+
           <div className="history-empty">
+
             <div className="empty-icon">
               📊
             </div>
@@ -489,12 +878,16 @@ function HealthReport() {
               Calculate your BMI to create
               your first health report.
             </p>
+
           </div>
+
         ) : (
+
           <div className="history-list">
 
             {reports.map(
               (report, index) => (
+
                 <div
                   className="history-card"
                   key={report._id}
@@ -547,10 +940,12 @@ function HealthReport() {
                   </button>
 
                 </div>
+
               )
             )}
 
           </div>
+
         )}
 
       </div>
