@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import "./HealthReport.css";
 
@@ -15,33 +16,22 @@ function HealthReport() {
   const [userEmail, setUserEmail] = useState("");
 
   const [reports, setReports] = useState([]);
-  const [loadingHistory, setLoadingHistory] =
-    useState(false);
-
-  const [historyError, setHistoryError] =
-    useState("");
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState("");
 
   // =========================
   // GET LOGGED-IN USER
   // =========================
 
   useEffect(() => {
-    const savedUser =
-      localStorage.getItem("user");
+    const savedUser = localStorage.getItem("user");
 
     if (savedUser) {
       try {
-        const user =
-          JSON.parse(savedUser);
-
-        setUserEmail(
-          user.email || ""
-        );
+        const user = JSON.parse(savedUser);
+        setUserEmail(user.email || "");
       } catch (error) {
-        console.log(
-          "User data error:",
-          error
-        );
+        console.log("User data error:", error);
       }
     }
   }, []);
@@ -65,31 +55,23 @@ function HealthReport() {
       setLoadingHistory(true);
       setHistoryError("");
 
-      const response =
-        await fetch(
-          `http://localhost:5000/api/health-reports/${encodeURIComponent(
-            userEmail
-          )}`
-        );
+      const response = await fetch(
+        `http://localhost:5000/api/health-reports/${encodeURIComponent(
+          userEmail
+        )}`
+      );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-            "Failed to load history"
+          data.message || "Failed to load history"
         );
       }
 
-      setReports(
-        data.reports || []
-      );
+      setReports(data.reports || []);
     } catch (error) {
-      console.log(
-        "Health history error:",
-        error
-      );
+      console.log("Health history error:", error);
 
       setHistoryError(
         "Unable to load health history."
@@ -109,12 +91,7 @@ function HealthReport() {
 
     setSavedMessage("");
 
-    if (
-      !h ||
-      !w ||
-      h <= 0 ||
-      w <= 0
-    ) {
+    if (!h || !w || h <= 0 || w <= 0) {
       setMessage(
         "Please enter a valid height and weight."
       );
@@ -125,41 +102,33 @@ function HealthReport() {
       return;
     }
 
-    const heightInMeters =
-      h / 100;
+    const heightInMeters = h / 100;
 
     const result =
-      w /
-      (heightInMeters *
-        heightInMeters);
+      w / (heightInMeters * heightInMeters);
 
-    const finalBMI =
-      Number(result.toFixed(1));
+    const finalBMI = Number(result.toFixed(1));
 
     let finalCategory = "";
     let healthMessage = "";
 
     if (result < 18.5) {
-      finalCategory =
-        "Underweight";
+      finalCategory = "Underweight";
 
       healthMessage =
         "Underweight - consider a balanced and nutritious diet.";
     } else if (result < 25) {
-      finalCategory =
-        "Normal";
+      finalCategory = "Normal";
 
       healthMessage =
         "Normal weight - keep maintaining a healthy lifestyle.";
     } else if (result < 30) {
-      finalCategory =
-        "Overweight";
+      finalCategory = "Overweight";
 
       healthMessage =
         "Overweight - regular exercise and balanced meals may help.";
     } else {
-      finalCategory =
-        "Obesity Range";
+      finalCategory = "Obesity Range";
 
       healthMessage =
         "Obesity range - consider discussing your health with a professional.";
@@ -184,35 +153,28 @@ function HealthReport() {
     try {
       setSaving(true);
 
-      const response =
-        await fetch(
-          "http://localhost:5000/api/health-report",
-          {
-            method: "POST",
+      const response = await fetch(
+        "http://localhost:5000/api/health-report",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: userEmail,
+            height: h,
+            weight: w,
+            bmi: finalBMI,
+            category: finalCategory,
+          }),
+        }
+      );
 
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              email: userEmail,
-              height: h,
-              weight: w,
-              bmi: finalBMI,
-              category:
-                finalCategory,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-            "Failed to save report"
+          data.message || "Failed to save report"
         );
       }
 
@@ -221,7 +183,6 @@ function HealthReport() {
       );
 
       await loadHealthHistory();
-
     } catch (error) {
       console.log(
         "Save health report error:",
@@ -241,51 +202,39 @@ function HealthReport() {
   // =========================
 
   const deleteReport = async (id) => {
-    const confirmDelete =
-      window.confirm(
-        "Are you sure you want to delete this health report?"
-      );
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this health report?"
+    );
 
     if (!confirmDelete) {
       return;
     }
 
     try {
-      const response =
-        await fetch(
-          `http://localhost:5000/api/health-report/${id}`,
-          {
-            method: "DELETE",
-          }
-        );
+      const response = await fetch(
+        `http://localhost:5000/api/health-report/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-            "Failed to delete report"
+          data.message || "Failed to delete report"
         );
       }
 
-      setReports(
-        (previousReports) =>
-          previousReports.filter(
-            (report) =>
-              report._id !== id
-          )
+      setReports((previousReports) =>
+        previousReports.filter(
+          (report) => report._id !== id
+        )
       );
-
     } catch (error) {
-      console.log(
-        "Delete error:",
-        error
-      );
+      console.log("Delete error:", error);
 
-      alert(
-        "Unable to delete report."
-      );
+      alert("Unable to delete report.");
     }
   };
 
@@ -294,16 +243,17 @@ function HealthReport() {
   // =========================
 
   const formatDate = (date) => {
-    return new Date(
-      date
-    ).toLocaleString("en-IN", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
+    return new Date(date).toLocaleString(
+      "en-IN",
+      {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }
+    );
   };
 
   // =========================
-  // BMI TREND CALCULATIONS
+  // BMI TREND
   // =========================
 
   const getBMIChange = () => {
@@ -311,19 +261,15 @@ function HealthReport() {
       return null;
     }
 
-    const latest =
-      Number(reports[0].bmi);
-
-    const previous =
-      Number(reports[1].bmi);
+    const latest = Number(reports[0].bmi);
+    const previous = Number(reports[1].bmi);
 
     return Number(
       (latest - previous).toFixed(1)
     );
   };
 
-  const bmiChange =
-    getBMIChange();
+  const bmiChange = getBMIChange();
 
   const getTrendText = () => {
     if (bmiChange === null) {
@@ -364,8 +310,7 @@ function HealthReport() {
   // =========================
 
   const getBMIPosition = (value) => {
-    const numericBMI =
-      Number(value);
+    const numericBMI = Number(value);
 
     const min = 15;
     const max = 40;
@@ -386,29 +331,89 @@ function HealthReport() {
     return position;
   };
 
+  // =========================
+  // DAY 24 HEALTH INSIGHTS
+  // =========================
+
+  const getAverageBMI = () => {
+    if (reports.length === 0) {
+      return "--";
+    }
+
+    const total = reports.reduce(
+      (sum, report) =>
+        sum + Number(report.bmi),
+      0
+    );
+
+    return (total / reports.length).toFixed(1);
+  };
+
+  const getLowestBMI = () => {
+    if (reports.length === 0) {
+      return "--";
+    }
+
+    return Math.min(
+      ...reports.map((report) =>
+        Number(report.bmi)
+      )
+    ).toFixed(1);
+  };
+
+  const getHighestBMI = () => {
+    if (reports.length === 0) {
+      return "--";
+    }
+
+    return Math.max(
+      ...reports.map((report) =>
+        Number(report.bmi)
+      )
+    ).toFixed(1);
+  };
+
+  const getOverallInsight = () => {
+    if (reports.length < 2) {
+      return "Keep recording your BMI to understand your health progress over time.";
+    }
+
+    if (bmiChange > 0) {
+      return "Your latest BMI is higher than your previous report. Continue focusing on regular physical activity and balanced nutrition.";
+    }
+
+    if (bmiChange < 0) {
+      return "Your latest BMI is lower than your previous report. Keep maintaining healthy lifestyle habits.";
+    }
+
+    return "Your latest BMI is similar to your previous report. Continue maintaining your healthy habits.";
+  };
+
+  // =========================
+  // RENDER
+  // =========================
+
   return (
     <section className="health-report">
 
-      {/* HEADER */}
+      {/* =========================
+          HEADER
+          ========================= */}
 
       <div className="report-header">
+        <p>SMART HEALTH ANALYSIS</p>
 
-        <p>
-          SMART HEALTH ANALYSIS
-        </p>
-
-        <h1>
-          Personal Health Report
-        </h1>
+        <h1>Personal Health Report</h1>
 
         <span>
           Check your BMI and understand
           your basic health information.
         </span>
-
       </div>
 
-      {/* BMI SECTION */}
+      {/* =========================
+          BMI SECTION
+          ========================= */}
 
       <div className="report-container">
 
@@ -420,9 +425,7 @@ function HealthReport() {
             {"\u2696\uFE0F"}
           </div>
 
-          <h2>
-            BMI Calculator
-          </h2>
+          <h2>BMI Calculator</h2>
 
           <p>
             Enter your height and weight
@@ -431,18 +434,14 @@ function HealthReport() {
 
           <div className="input-group">
 
-            <label>
-              Height (cm)
-            </label>
+            <label>Height (cm)</label>
 
             <input
               type="number"
               placeholder="Example: 175"
               value={height}
               onChange={(e) =>
-                setHeight(
-                  e.target.value
-                )
+                setHeight(e.target.value)
               }
             />
 
@@ -450,18 +449,14 @@ function HealthReport() {
 
           <div className="input-group">
 
-            <label>
-              Weight (kg)
-            </label>
+            <label>Weight (kg)</label>
 
             <input
               type="number"
               placeholder="Example: 70"
               value={weight}
               onChange={(e) =>
-                setWeight(
-                  e.target.value
-                )
+                setWeight(e.target.value)
               }
             />
 
@@ -493,15 +488,11 @@ function HealthReport() {
             {"\u2764\uFE0F"}
           </div>
 
-          <p>
-            YOUR BMI
-          </p>
+          <p>YOUR BMI</p>
 
           {bmi ? (
             <>
-              <h2>
-                {bmi}
-              </h2>
+              <h2>{bmi}</h2>
 
               <div className="bmi-status">
                 {category}
@@ -513,9 +504,7 @@ function HealthReport() {
             </>
           ) : (
             <>
-              <h2>
-                --
-              </h2>
+              <h2>--</h2>
 
               <span className="health-message">
                 Enter your details to see
@@ -537,13 +526,9 @@ function HealthReport() {
         <div className="trend-header">
 
           <div>
-            <p>
-              HEALTH ANALYTICS
-            </p>
+            <p>HEALTH ANALYTICS</p>
 
-            <h2>
-              📊 BMI Trend
-            </h2>
+            <h2>📊 BMI Trend</h2>
           </div>
 
           <div className="trend-count">
@@ -559,9 +544,7 @@ function HealthReport() {
 
           <div className="trend-empty">
 
-            <div>
-              📊
-            </div>
+            <div>📊</div>
 
             <h3>
               Your BMI Trend Will Appear Here
@@ -578,15 +561,13 @@ function HealthReport() {
 
           <>
 
-            {/* CURRENT BMI */}
+            {/* TREND SUMMARY */}
 
             <div className="trend-summary">
 
               <div className="trend-summary-card">
 
-                <span>
-                  Latest BMI
-                </span>
+                <span>Latest BMI</span>
 
                 <strong>
                   {reports[0].bmi}
@@ -600,9 +581,7 @@ function HealthReport() {
 
               <div className="trend-summary-card">
 
-                <span>
-                  Previous BMI
-                </span>
+                <span>Previous BMI</span>
 
                 <strong>
                   {reports.length > 1
@@ -620,9 +599,7 @@ function HealthReport() {
 
               <div className="trend-summary-card">
 
-                <span>
-                  BMI Change
-                </span>
+                <span>BMI Change</span>
 
                 <strong>
                   {bmiChange === null
@@ -647,9 +624,7 @@ function HealthReport() {
 
             <div className="bmi-scale-section">
 
-              <h3>
-                BMI Range
-              </h3>
+              <h3>BMI Range</h3>
 
               <div className="bmi-scale">
 
@@ -672,25 +647,11 @@ function HealthReport() {
 
                 <div className="scale-labels">
 
-                  <span>
-                    15
-                  </span>
-
-                  <span>
-                    18.5
-                  </span>
-
-                  <span>
-                    25
-                  </span>
-
-                  <span>
-                    30
-                  </span>
-
-                  <span>
-                    40
-                  </span>
+                  <span>15</span>
+                  <span>18.5</span>
+                  <span>25</span>
+                  <span>30</span>
+                  <span>40</span>
 
                 </div>
 
@@ -698,21 +659,10 @@ function HealthReport() {
 
               <div className="scale-categories">
 
-                <span>
-                  Underweight
-                </span>
-
-                <span>
-                  Normal
-                </span>
-
-                <span>
-                  Overweight
-                </span>
-
-                <span>
-                  Obesity
-                </span>
+                <span>Underweight</span>
+                <span>Normal</span>
+                <span>Overweight</span>
+                <span>Obesity</span>
 
               </div>
 
@@ -727,9 +677,7 @@ function HealthReport() {
               </span>
 
               <div>
-                <h3>
-                  BMI Progress
-                </h3>
+                <h3>BMI Progress</h3>
 
                 <p>
                   {getTrendText()}
@@ -742,80 +690,248 @@ function HealthReport() {
 
             <div className="trend-chart">
 
-              <h3>
-                BMI History Chart
-              </h3>
+              <h3>BMI History Chart</h3>
 
               <div className="chart-area">
 
                 {reports
                   .slice()
                   .reverse()
-                  .map(
-                    (report, index) => {
+                  .map((report) => {
 
-                      const chartBMI =
-                        Number(
-                          report.bmi
-                        );
+                    const chartBMI =
+                      Number(report.bmi);
 
-                      const minBMI = 15;
-                      const maxBMI = 40;
+                    const minBMI = 15;
+                    const maxBMI = 40;
 
-                      let heightPercent =
-                        ((chartBMI -
-                          minBMI) /
-                          (maxBMI -
-                            minBMI)) *
-                        100;
+                    let heightPercent =
+                      ((chartBMI -
+                        minBMI) /
+                        (maxBMI -
+                          minBMI)) *
+                      100;
 
-                      if (
-                        heightPercent < 10
-                      ) {
-                        heightPercent = 10;
-                      }
-
-                      if (
-                        heightPercent > 100
-                      ) {
-                        heightPercent = 100;
-                      }
-
-                      return (
-                        <div
-                          className="chart-column"
-                          key={
-                            report._id
-                          }
-                        >
-
-                          <div className="chart-value">
-                            {report.bmi}
-                          </div>
-
-                          <div
-                            className="chart-bar"
-                            style={{
-                              height: `${heightPercent}%`,
-                            }}
-                          />
-
-                          <small>
-                            {new Date(
-                              report.createdAt
-                            ).toLocaleDateString(
-                              "en-IN",
-                              {
-                                day: "2-digit",
-                                month: "short",
-                              }
-                            )}
-                          </small>
-
-                        </div>
-                      );
+                    if (
+                      heightPercent < 10
+                    ) {
+                      heightPercent = 10;
                     }
-                  )}
+
+                    if (
+                      heightPercent > 100
+                    ) {
+                      heightPercent = 100;
+                    }
+
+                    return (
+                      <div
+                        className="chart-column"
+                        key={report._id}
+                      >
+
+                        <div className="chart-value">
+                          {report.bmi}
+                        </div>
+
+                        <div
+                          className="chart-bar"
+                          style={{
+                            height: `${heightPercent}%`,
+                          }}
+                        />
+
+                        <small>
+                          {new Date(
+                            report.createdAt
+                          ).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                            }
+                          )}
+                        </small>
+
+                      </div>
+                    );
+                  })}
+
+              </div>
+
+            </div>
+
+          </>
+
+        )}
+
+      </div>
+
+      {/* =========================
+          DAY 24 HEALTH INSIGHTS
+          ========================= */}
+
+      <div className="health-insights">
+
+        <div className="insights-header">
+
+          <p>SMART HEALTH ANALYSIS</p>
+
+          <h2>🧠 Health Insights</h2>
+
+          <span>
+            A quick summary of your BMI
+            history and progress.
+          </span>
+
+        </div>
+
+        {reports.length === 0 ? (
+
+          <div className="insights-empty">
+
+            <div className="insights-empty-icon">
+              📊
+            </div>
+
+            <h3>
+              No Insights Yet
+            </h3>
+
+            <p>
+              Calculate your BMI to generate
+              personalized health insights.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <>
+
+            {/* INSIGHT STATISTICS */}
+
+            <div className="insights-grid">
+
+              <div className="insight-card">
+
+                <div className="insight-card-icon">
+                  📊
+                </div>
+
+                <span>
+                  Average BMI
+                </span>
+
+                <strong>
+                  {getAverageBMI()}
+                </strong>
+
+              </div>
+
+              <div className="insight-card">
+
+                <div className="insight-card-icon">
+                  ⬇️
+                </div>
+
+                <span>
+                  Lowest BMI
+                </span>
+
+                <strong>
+                  {getLowestBMI()}
+                </strong>
+
+              </div>
+
+              <div className="insight-card">
+
+                <div className="insight-card-icon">
+                  ⬆️
+                </div>
+
+                <span>
+                  Highest BMI
+                </span>
+
+                <strong>
+                  {getHighestBMI()}
+                </strong>
+
+              </div>
+
+              <div className="insight-card">
+
+                <div className="insight-card-icon">
+                  📋
+                </div>
+
+                <span>
+                  Total Reports
+                </span>
+
+                <strong>
+                  {reports.length}
+                </strong>
+
+              </div>
+
+            </div>
+
+            {/* OVERALL PROGRESS */}
+
+            <div className="overall-insight">
+
+              <div className="insight-icon">
+                {bmiChange === null
+                  ? "💡"
+                  : bmiChange > 0
+                  ? "📈"
+                  : bmiChange < 0
+                  ? "📉"
+                  : "➡️"}
+              </div>
+
+              <div>
+
+                <h3>
+                  Overall Progress
+                </h3>
+
+                <p>
+                  {getOverallInsight()}
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* HEALTH REMINDER */}
+
+            <div className="health-reminder">
+
+              <div className="reminder-icon">
+                💡
+              </div>
+
+              <div>
+
+                <h3>
+                  Healthy Reminder
+                </h3>
+
+                <p>
+                  BMI is a general screening
+                  measure and does not provide
+                  a complete picture of individual
+                  health. Maintain balanced
+                  nutrition, regular physical
+                  activity, adequate sleep, and
+                  consult a qualified healthcare
+                  professional for personalized
+                  advice.
+                </p>
 
               </div>
 
@@ -903,9 +1019,7 @@ function HealthReport() {
                       BMI: {report.bmi}
                     </h3>
 
-                    <span
-                      className="history-category"
-                    >
+                    <span className="history-category">
                       {report.category}
                     </span>
 
@@ -950,7 +1064,9 @@ function HealthReport() {
 
       </div>
 
-      {/* HEALTHY TIPS */}
+      {/* =========================
+          HEALTHY TIPS
+          ========================= */}
 
       <div className="health-tips">
 
@@ -1035,6 +1151,6 @@ function HealthReport() {
 
     </section>
   );
-}
 
+}
 export default HealthReport;
