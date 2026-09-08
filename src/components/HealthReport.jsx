@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import "./HealthReport.css";
 
-function HealthReport() {
+function HealthReport() 
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
 
@@ -20,6 +20,13 @@ function HealthReport() {
   const [historyError, setHistoryError] = useState("");
 
   // =========================
+  // DAY 25 HEALTH GOAL
+  // =========================
+
+  const [targetBMI, setTargetBMI] = useState("");
+  const [goalSaved, setGoalSaved] = useState(false);
+
+  // =========================
   // GET LOGGED-IN USER
   // =========================
 
@@ -33,6 +40,19 @@ function HealthReport() {
       } catch (error) {
         console.log("User data error:", error);
       }
+    }
+  }, []);
+
+  // =========================
+  // LOAD SAVED HEALTH GOAL
+  // =========================
+
+  useEffect(() => {
+    const savedTargetBMI =
+      localStorage.getItem("healthTargetBMI");
+
+    if (savedTargetBMI) {
+      setTargetBMI(savedTargetBMI);
     }
   }, []);
 
@@ -80,6 +100,171 @@ function HealthReport() {
       setLoadingHistory(false);
     }
   };
+
+  // =========================
+  // DAY 25 SAVE HEALTH GOAL
+  // =========================
+
+  const saveHealthGoal = () => {
+    const numericTarget = Number(targetBMI);
+
+    if (
+      !numericTarget ||
+      numericTarget <= 0 ||
+      numericTarget > 60
+    ) {
+      setGoalSaved(false);
+
+      alert(
+        "Please enter a valid target BMI between 1 and 60."
+      );
+
+      return;
+    }
+
+    localStorage.setItem(
+      "healthTargetBMI",
+      numericTarget.toFixed(1)
+    );
+
+    setTargetBMI(numericTarget.toFixed(1));
+    setGoalSaved(true);
+
+    setTimeout(() => {
+      setGoalSaved(false);
+    }, 2500);
+  };
+
+  // =========================
+  // DAY 25 CURRENT BMI
+  // =========================
+
+  const getCurrentBMI = () => {
+    if (reports.length > 0) {
+      return Number(reports[0].bmi);
+    }
+
+    if (bmi !== null) {
+      return Number(bmi);
+    }
+
+    return null;
+  };
+
+  const currentBMI = getCurrentBMI();
+
+  // =========================
+  // DAY 25 BMI DIFFERENCE
+  // =========================
+
+  const getBMIDifference = () => {
+    if (
+      currentBMI === null ||
+      !targetBMI ||
+      Number(targetBMI) <= 0
+    ) {
+      return null;
+    }
+
+    return Math.abs(
+      currentBMI - Number(targetBMI)
+    ).toFixed(1);
+  };
+
+  const bmiDifference = getBMIDifference();
+
+  // =========================
+  // DAY 25 GOAL PROGRESS
+  // =========================
+
+  const getGoalProgress = () => {
+    if (
+      currentBMI === null ||
+      !targetBMI ||
+      Number(targetBMI) <= 0
+    ) {
+      return 0;
+    }
+
+    const target = Number(targetBMI);
+
+    if (Math.abs(currentBMI - target) < 0.1) {
+      return 100;
+    }
+
+    if (reports.length < 2) {
+      return 0;
+    }
+
+    const oldestBMI = Number(
+      reports[reports.length - 1].bmi
+    );
+
+    const totalDistance = Math.abs(
+      oldestBMI - target
+    );
+
+    const currentDistance = Math.abs(
+      currentBMI - target
+    );
+
+    if (totalDistance === 0) {
+      return 0;
+    }
+
+    let progress =
+      ((totalDistance - currentDistance) /
+        totalDistance) *
+      100;
+
+    if (progress < 0) {
+      progress = 0;
+    }
+
+    if (progress > 100) {
+      progress = 100;
+    }
+
+    return Math.round(progress);
+  };
+
+  const goalProgress = getGoalProgress();
+
+  // =========================
+  // DAY 25 GOAL STATUS
+  // =========================
+
+  const getGoalStatus = () => {
+    if (currentBMI === null) {
+      return "Calculate your BMI to start tracking your goal.";
+    }
+
+    if (!targetBMI) {
+      return "Set a target BMI to start your health goal.";
+    }
+
+    const target = Number(targetBMI);
+
+    if (Math.abs(currentBMI - target) < 0.1) {
+      return "🎉 You have reached your target BMI!";
+    }
+
+    if (currentBMI > target) {
+      return `You are ${Math.abs(
+        currentBMI - target
+      ).toFixed(
+        1
+      )} BMI points away from your target.`;
+    }
+
+    return `Your current BMI is ${Math.abs(
+      currentBMI - target
+    ).toFixed(
+      1
+    )} points below your target.`;
+  };
+
+  const goalStatus = getGoalStatus();
 
   // =========================
   // CALCULATE BMI
@@ -396,9 +581,7 @@ function HealthReport() {
   return (
     <section className="health-report">
 
-      {/* =========================
-          HEADER
-          ========================= */}
+      {/* HEADER */}
 
       <div className="report-header">
         <p>SMART HEALTH ANALYSIS</p>
@@ -411,9 +594,7 @@ function HealthReport() {
         </span>
       </div>
 
-      {/* =========================
-          BMI SECTION
-          ========================= */}
+      {/* BMI SECTION */}
 
       <div className="report-container">
 
@@ -518,6 +699,206 @@ function HealthReport() {
       </div>
 
       {/* =========================
+          DAY 25 HEALTH GOALS
+          ========================= */}
+
+      <div className="health-goals">
+
+        <div className="goals-header">
+
+          <p>DAY 25 • SMART HEALTH TRACKING</p>
+
+          <h2>🎯 My Health Goal</h2>
+
+          <span>
+            Set a target BMI and track your
+            progress over time.
+          </span>
+
+        </div>
+
+        <div className="goal-container">
+
+          {/* SET TARGET */}
+
+          <div className="goal-setting-card">
+
+            <div className="goal-icon">
+              🎯
+            </div>
+
+            <h3>Set Target BMI</h3>
+
+            <p>
+              Choose a target BMI that you
+              want to track.
+            </p>
+
+            <div className="goal-input-group">
+
+              <label>
+                Target BMI
+              </label>
+
+              <input
+                type="number"
+                step="0.1"
+                min="1"
+                max="60"
+                placeholder="Example: 22.5"
+                value={targetBMI}
+                onChange={(e) => {
+                  setTargetBMI(
+                    e.target.value
+                  );
+                  setGoalSaved(false);
+                }}
+              />
+
+            </div>
+
+            <button
+              className="save-goal-btn"
+              onClick={saveHealthGoal}
+            >
+              💾 Save Health Goal
+            </button>
+
+            {goalSaved && (
+              <p className="goal-saved-message">
+                ✅ Target BMI saved successfully!
+              </p>
+            )}
+
+          </div>
+
+          {/* GOAL PROGRESS */}
+
+          <div className="goal-progress-card">
+
+            <div className="goal-progress-top">
+
+              <div>
+
+                <span>
+                  CURRENT BMI
+                </span>
+
+                <strong>
+                  {currentBMI !== null
+                    ? currentBMI.toFixed(1)
+                    : "--"}
+                </strong>
+
+              </div>
+
+              <div className="goal-arrow">
+                →
+              </div>
+
+              <div>
+
+                <span>
+                  TARGET BMI
+                </span>
+
+                <strong>
+                  {targetBMI
+                    ? Number(
+                        targetBMI
+                      ).toFixed(1)
+                    : "--"}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div className="goal-difference">
+
+              <span>
+                BMI Difference
+              </span>
+
+              <strong>
+                {bmiDifference !== null
+                  ? bmiDifference
+                  : "--"}
+              </strong>
+
+            </div>
+
+            <div className="progress-heading">
+
+              <span>
+                Goal Progress
+              </span>
+
+              <strong>
+                {goalProgress}%
+              </strong>
+
+            </div>
+
+            <div className="goal-progress-track">
+
+              <div
+                className="goal-progress-fill"
+                style={{
+                  width: `${goalProgress}%`,
+                }}
+              >
+                {goalProgress >= 15 &&
+                  `${goalProgress}%`}
+              </div>
+
+            </div>
+
+            <div className="goal-status">
+
+              <div className="goal-status-icon">
+                {goalProgress === 100
+                  ? "🏆"
+                  : goalProgress > 50
+                  ? "🔥"
+                  : "🚀"}
+              </div>
+
+              <div>
+
+                <h3>
+                  {goalProgress === 100
+                    ? "Goal Achieved!"
+                    : "Your Progress"}
+                </h3>
+
+                <p>
+                  {goalStatus}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div className="goal-note">
+
+          💡 <strong>Note:</strong> BMI is a
+          general screening measure and should
+          not be used as the only measure of
+          individual health. Your target should
+          be appropriate for you and, when needed,
+          discussed with a qualified healthcare
+          professional.
+
+        </div>
+
+      </div>
+
+      {/* =========================
           BMI TREND
           ========================= */}
 
@@ -560,8 +941,6 @@ function HealthReport() {
         ) : (
 
           <>
-
-            {/* TREND SUMMARY */}
 
             <div className="trend-summary">
 
@@ -620,8 +999,6 @@ function HealthReport() {
 
             </div>
 
-            {/* BMI SCALE */}
-
             <div className="bmi-scale-section">
 
               <h3>BMI Range</h3>
@@ -668,8 +1045,6 @@ function HealthReport() {
 
             </div>
 
-            {/* TREND MESSAGE */}
-
             <div className="trend-message">
 
               <span>
@@ -677,16 +1052,16 @@ function HealthReport() {
               </span>
 
               <div>
+
                 <h3>BMI Progress</h3>
 
                 <p>
                   {getTrendText()}
                 </p>
+
               </div>
 
             </div>
-
-            {/* SIMPLE CHART */}
 
             <div className="trend-chart">
 
@@ -809,8 +1184,6 @@ function HealthReport() {
 
           <>
 
-            {/* INSIGHT STATISTICS */}
-
             <div className="insights-grid">
 
               <div className="insight-card">
@@ -879,8 +1252,6 @@ function HealthReport() {
 
             </div>
 
-            {/* OVERALL PROGRESS */}
-
             <div className="overall-insight">
 
               <div className="insight-icon">
@@ -906,8 +1277,6 @@ function HealthReport() {
               </div>
 
             </div>
-
-            {/* HEALTH REMINDER */}
 
             <div className="health-reminder">
 
@@ -1152,5 +1521,6 @@ function HealthReport() {
     </section>
   );
 
-}
+
 export default HealthReport;
+
