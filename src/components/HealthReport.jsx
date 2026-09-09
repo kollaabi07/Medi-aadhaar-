@@ -1,8 +1,9 @@
 
 import { useEffect, useState } from "react";
+import jsPDF from "jspdf";
 import "./HealthReport.css";
 
-function HealthReport() 
+function HealthReport() {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
 
@@ -19,12 +20,7 @@ function HealthReport()
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState("");
 
-  // =========================
-  // DAY 25 HEALTH GOAL
-  // =========================
-
-  const [targetBMI, setTargetBMI] = useState("");
-  const [goalSaved, setGoalSaved] = useState(false);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
 
   // =========================
   // GET LOGGED-IN USER
@@ -40,19 +36,6 @@ function HealthReport()
       } catch (error) {
         console.log("User data error:", error);
       }
-    }
-  }, []);
-
-  // =========================
-  // LOAD SAVED HEALTH GOAL
-  // =========================
-
-  useEffect(() => {
-    const savedTargetBMI =
-      localStorage.getItem("healthTargetBMI");
-
-    if (savedTargetBMI) {
-      setTargetBMI(savedTargetBMI);
     }
   }, []);
 
@@ -100,171 +83,6 @@ function HealthReport()
       setLoadingHistory(false);
     }
   };
-
-  // =========================
-  // DAY 25 SAVE HEALTH GOAL
-  // =========================
-
-  const saveHealthGoal = () => {
-    const numericTarget = Number(targetBMI);
-
-    if (
-      !numericTarget ||
-      numericTarget <= 0 ||
-      numericTarget > 60
-    ) {
-      setGoalSaved(false);
-
-      alert(
-        "Please enter a valid target BMI between 1 and 60."
-      );
-
-      return;
-    }
-
-    localStorage.setItem(
-      "healthTargetBMI",
-      numericTarget.toFixed(1)
-    );
-
-    setTargetBMI(numericTarget.toFixed(1));
-    setGoalSaved(true);
-
-    setTimeout(() => {
-      setGoalSaved(false);
-    }, 2500);
-  };
-
-  // =========================
-  // DAY 25 CURRENT BMI
-  // =========================
-
-  const getCurrentBMI = () => {
-    if (reports.length > 0) {
-      return Number(reports[0].bmi);
-    }
-
-    if (bmi !== null) {
-      return Number(bmi);
-    }
-
-    return null;
-  };
-
-  const currentBMI = getCurrentBMI();
-
-  // =========================
-  // DAY 25 BMI DIFFERENCE
-  // =========================
-
-  const getBMIDifference = () => {
-    if (
-      currentBMI === null ||
-      !targetBMI ||
-      Number(targetBMI) <= 0
-    ) {
-      return null;
-    }
-
-    return Math.abs(
-      currentBMI - Number(targetBMI)
-    ).toFixed(1);
-  };
-
-  const bmiDifference = getBMIDifference();
-
-  // =========================
-  // DAY 25 GOAL PROGRESS
-  // =========================
-
-  const getGoalProgress = () => {
-    if (
-      currentBMI === null ||
-      !targetBMI ||
-      Number(targetBMI) <= 0
-    ) {
-      return 0;
-    }
-
-    const target = Number(targetBMI);
-
-    if (Math.abs(currentBMI - target) < 0.1) {
-      return 100;
-    }
-
-    if (reports.length < 2) {
-      return 0;
-    }
-
-    const oldestBMI = Number(
-      reports[reports.length - 1].bmi
-    );
-
-    const totalDistance = Math.abs(
-      oldestBMI - target
-    );
-
-    const currentDistance = Math.abs(
-      currentBMI - target
-    );
-
-    if (totalDistance === 0) {
-      return 0;
-    }
-
-    let progress =
-      ((totalDistance - currentDistance) /
-        totalDistance) *
-      100;
-
-    if (progress < 0) {
-      progress = 0;
-    }
-
-    if (progress > 100) {
-      progress = 100;
-    }
-
-    return Math.round(progress);
-  };
-
-  const goalProgress = getGoalProgress();
-
-  // =========================
-  // DAY 25 GOAL STATUS
-  // =========================
-
-  const getGoalStatus = () => {
-    if (currentBMI === null) {
-      return "Calculate your BMI to start tracking your goal.";
-    }
-
-    if (!targetBMI) {
-      return "Set a target BMI to start your health goal.";
-    }
-
-    const target = Number(targetBMI);
-
-    if (Math.abs(currentBMI - target) < 0.1) {
-      return "🎉 You have reached your target BMI!";
-    }
-
-    if (currentBMI > target) {
-      return `You are ${Math.abs(
-        currentBMI - target
-      ).toFixed(
-        1
-      )} BMI points away from your target.`;
-    }
-
-    return `Your current BMI is ${Math.abs(
-      currentBMI - target
-    ).toFixed(
-      1
-    )} points below your target.`;
-  };
-
-  const goalStatus = getGoalStatus();
 
   // =========================
   // CALCULATE BMI
@@ -517,7 +335,7 @@ function HealthReport()
   };
 
   // =========================
-  // DAY 24 HEALTH INSIGHTS
+  // HEALTH INSIGHTS
   // =========================
 
   const getAverageBMI = () => {
@@ -575,6 +393,387 @@ function HealthReport()
   };
 
   // =========================
+  // DAY 26 - GENERATE PDF
+  // =========================
+
+  const generatePDF = () => {
+    if (reports.length === 0) {
+      alert(
+        "Please calculate your BMI first before downloading the report."
+      );
+      return;
+    }
+
+    try {
+      setGeneratingPDF(true);
+
+      const doc = new jsPDF();
+
+      const latestReport = reports[0];
+
+      const latestBMI = Number(
+        latestReport.bmi
+      );
+
+      // =========================
+      // PDF HEADER
+      // =========================
+
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text(
+        "MAMA HEALTH CARE",
+        20,
+        25
+      );
+
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "normal");
+      doc.text(
+        "Personal Health Report",
+        20,
+        35
+      );
+
+      doc.setDrawColor(100, 100, 100);
+      doc.line(20, 42, 190, 42);
+
+      // =========================
+      // USER INFORMATION
+      // =========================
+
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+
+      doc.text(
+        "User Information",
+        20,
+        55
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+
+      doc.text(
+        `Email: ${userEmail || "Not available"}`,
+        20,
+        65
+      );
+
+      doc.text(
+        `Report Date: ${new Date().toLocaleDateString(
+          "en-IN"
+        )}`,
+        20,
+        73
+      );
+
+      // =========================
+      // CURRENT BMI
+      // =========================
+
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+
+      doc.text(
+        "Latest BMI Result",
+        20,
+        90
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+
+      doc.text(
+        `Height: ${latestReport.height} cm`,
+        20,
+        102
+      );
+
+      doc.text(
+        `Weight: ${latestReport.weight} kg`,
+        20,
+        110
+      );
+
+      doc.text(
+        `BMI: ${latestBMI}`,
+        20,
+        118
+      );
+
+      doc.text(
+        `Category: ${latestReport.category}`,
+        20,
+        126
+      );
+
+      // =========================
+      // HEALTH MESSAGE
+      // =========================
+
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+
+      doc.text(
+        "Health Information",
+        20,
+        143
+      );
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+
+      const pdfMessage =
+        latestReport.category ===
+        "Underweight"
+          ? "Consider maintaining a balanced and nutritious diet."
+          : latestReport.category ===
+            "Normal"
+          ? "Keep maintaining a healthy lifestyle."
+          : latestReport.category ===
+            "Overweight"
+          ? "Regular exercise and balanced meals may help."
+          : "Consider discussing your health with a qualified healthcare professional.";
+
+      const messageLines =
+        doc.splitTextToSize(
+          pdfMessage,
+          165
+        );
+
+      doc.text(
+        messageLines,
+        20,
+        153
+      );
+
+      // =========================
+      // BMI HISTORY
+      // =========================
+
+      let historyStartY = 175;
+
+      if (reports.length > 4) {
+        historyStartY = 180;
+      }
+
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+
+      doc.text(
+        "BMI History",
+        20,
+        historyStartY
+      );
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("Date", 20, historyStartY + 12);
+      doc.text("BMI", 75, historyStartY + 12);
+      doc.text(
+        "Category",
+        105,
+        historyStartY + 12
+      );
+
+      doc.setFont("helvetica", "normal");
+
+      let currentY =
+        historyStartY + 20;
+
+      reports.slice(0, 8).forEach(
+        (report) => {
+          const reportDate =
+            new Date(
+              report.createdAt
+            ).toLocaleDateString(
+              "en-IN"
+            );
+
+          doc.text(
+            reportDate,
+            20,
+            currentY
+          );
+
+          doc.text(
+            String(report.bmi),
+            75,
+            currentY
+          );
+
+          doc.text(
+            String(report.category),
+            105,
+            currentY
+          );
+
+          currentY += 9;
+        }
+      );
+
+      // =========================
+      // INSIGHTS
+      // =========================
+
+      const insightY =
+        Math.max(currentY + 12, 250);
+
+      if (insightY > 260) {
+        doc.addPage();
+
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+
+        doc.text(
+          "Health Insights",
+          20,
+          25
+        );
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+
+        doc.text(
+          `Average BMI: ${getAverageBMI()}`,
+          20,
+          40
+        );
+
+        doc.text(
+          `Lowest BMI: ${getLowestBMI()}`,
+          20,
+          49
+        );
+
+        doc.text(
+          `Highest BMI: ${getHighestBMI()}`,
+          20,
+          58
+        );
+
+        doc.text(
+          `Total Reports: ${reports.length}`,
+          20,
+          67
+        );
+
+        const insightLines =
+          doc.splitTextToSize(
+            getOverallInsight(),
+            165
+          );
+
+        doc.text(
+          insightLines,
+          20,
+          82
+        );
+      } else {
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+
+        doc.text(
+          "Health Insights",
+          20,
+          insightY
+        );
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+
+        doc.text(
+          `Average BMI: ${getAverageBMI()}`,
+          20,
+          insightY + 12
+        );
+
+        doc.text(
+          `Lowest BMI: ${getLowestBMI()}`,
+          75,
+          insightY + 12
+        );
+
+        doc.text(
+          `Highest BMI: ${getHighestBMI()}`,
+          130,
+          insightY + 12
+        );
+
+        const insightLines =
+          doc.splitTextToSize(
+            getOverallInsight(),
+            165
+          );
+
+        doc.text(
+          insightLines,
+          20,
+          insightY + 25
+        );
+      }
+
+      // =========================
+      // FOOTER
+      // =========================
+
+      const pageCount =
+        doc.internal.getNumberOfPages();
+
+      for (
+        let page = 1;
+        page <= pageCount;
+        page++
+      ) {
+        doc.setPage(page);
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+
+        doc.text(
+          "MAMA Health Care - Generated Health Report",
+          20,
+          285
+        );
+
+        doc.text(
+          `Page ${page} of ${pageCount}`,
+          165,
+          285
+        );
+      }
+
+      // =========================
+      // DOWNLOAD
+      // =========================
+
+      const fileName =
+        `MAMA-Health-Report-${new Date()
+          .toISOString()
+          .slice(0, 10)}.pdf`;
+
+      doc.save(fileName);
+
+      setSavedMessage(
+        "✅ PDF health report downloaded successfully!"
+      );
+    } catch (error) {
+      console.log(
+        "PDF generation error:",
+        error
+      );
+
+      alert(
+        "Unable to generate PDF report."
+      );
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
+  // =========================
   // RENDER
   // =========================
 
@@ -586,7 +785,9 @@ function HealthReport()
       <div className="report-header">
         <p>SMART HEALTH ANALYSIS</p>
 
-        <h1>Personal Health Report</h1>
+        <h1>
+          Personal Health Report
+        </h1>
 
         <span>
           Check your BMI and understand
@@ -598,7 +799,7 @@ function HealthReport()
 
       <div className="report-container">
 
-        {/* CALCULATOR CARD */}
+        {/* CALCULATOR */}
 
         <div className="bmi-card">
 
@@ -606,7 +807,9 @@ function HealthReport()
             {"\u2696\uFE0F"}
           </div>
 
-          <h2>BMI Calculator</h2>
+          <h2>
+            BMI Calculator
+          </h2>
 
           <p>
             Enter your height and weight
@@ -615,14 +818,18 @@ function HealthReport()
 
           <div className="input-group">
 
-            <label>Height (cm)</label>
+            <label>
+              Height (cm)
+            </label>
 
             <input
               type="number"
               placeholder="Example: 175"
               value={height}
               onChange={(e) =>
-                setHeight(e.target.value)
+                setHeight(
+                  e.target.value
+                )
               }
             />
 
@@ -630,14 +837,18 @@ function HealthReport()
 
           <div className="input-group">
 
-            <label>Weight (kg)</label>
+            <label>
+              Weight (kg)
+            </label>
 
             <input
               type="number"
               placeholder="Example: 70"
               value={weight}
               onChange={(e) =>
-                setWeight(e.target.value)
+                setWeight(
+                  e.target.value
+                )
               }
             />
 
@@ -661,7 +872,7 @@ function HealthReport()
 
         </div>
 
-        {/* RESULT CARD */}
+        {/* RESULT */}
 
         <div className="result-card">
 
@@ -669,11 +880,15 @@ function HealthReport()
             {"\u2764\uFE0F"}
           </div>
 
-          <p>YOUR BMI</p>
+          <p>
+            YOUR BMI
+          </p>
 
           {bmi ? (
             <>
-              <h2>{bmi}</h2>
+              <h2>
+                {bmi}
+              </h2>
 
               <div className="bmi-status">
                 {category}
@@ -682,10 +897,25 @@ function HealthReport()
               <span className="health-message">
                 {message}
               </span>
+
+              {/* DAY 26 PDF BUTTON */}
+
+              <button
+                className="pdf-btn"
+                onClick={generatePDF}
+                disabled={generatingPDF}
+              >
+                {generatingPDF
+                  ? "Generating PDF..."
+                  : "📄 Download PDF Report"}
+              </button>
+
             </>
           ) : (
             <>
-              <h2>--</h2>
+              <h2>
+                --
+              </h2>
 
               <span className="health-message">
                 Enter your details to see
@@ -698,218 +928,22 @@ function HealthReport()
 
       </div>
 
-      {/* =========================
-          DAY 25 HEALTH GOALS
-          ========================= */}
-
-      <div className="health-goals">
-
-        <div className="goals-header">
-
-          <p>DAY 25 • SMART HEALTH TRACKING</p>
-
-          <h2>🎯 My Health Goal</h2>
-
-          <span>
-            Set a target BMI and track your
-            progress over time.
-          </span>
-
-        </div>
-
-        <div className="goal-container">
-
-          {/* SET TARGET */}
-
-          <div className="goal-setting-card">
-
-            <div className="goal-icon">
-              🎯
-            </div>
-
-            <h3>Set Target BMI</h3>
-
-            <p>
-              Choose a target BMI that you
-              want to track.
-            </p>
-
-            <div className="goal-input-group">
-
-              <label>
-                Target BMI
-              </label>
-
-              <input
-                type="number"
-                step="0.1"
-                min="1"
-                max="60"
-                placeholder="Example: 22.5"
-                value={targetBMI}
-                onChange={(e) => {
-                  setTargetBMI(
-                    e.target.value
-                  );
-                  setGoalSaved(false);
-                }}
-              />
-
-            </div>
-
-            <button
-              className="save-goal-btn"
-              onClick={saveHealthGoal}
-            >
-              💾 Save Health Goal
-            </button>
-
-            {goalSaved && (
-              <p className="goal-saved-message">
-                ✅ Target BMI saved successfully!
-              </p>
-            )}
-
-          </div>
-
-          {/* GOAL PROGRESS */}
-
-          <div className="goal-progress-card">
-
-            <div className="goal-progress-top">
-
-              <div>
-
-                <span>
-                  CURRENT BMI
-                </span>
-
-                <strong>
-                  {currentBMI !== null
-                    ? currentBMI.toFixed(1)
-                    : "--"}
-                </strong>
-
-              </div>
-
-              <div className="goal-arrow">
-                →
-              </div>
-
-              <div>
-
-                <span>
-                  TARGET BMI
-                </span>
-
-                <strong>
-                  {targetBMI
-                    ? Number(
-                        targetBMI
-                      ).toFixed(1)
-                    : "--"}
-                </strong>
-
-              </div>
-
-            </div>
-
-            <div className="goal-difference">
-
-              <span>
-                BMI Difference
-              </span>
-
-              <strong>
-                {bmiDifference !== null
-                  ? bmiDifference
-                  : "--"}
-              </strong>
-
-            </div>
-
-            <div className="progress-heading">
-
-              <span>
-                Goal Progress
-              </span>
-
-              <strong>
-                {goalProgress}%
-              </strong>
-
-            </div>
-
-            <div className="goal-progress-track">
-
-              <div
-                className="goal-progress-fill"
-                style={{
-                  width: `${goalProgress}%`,
-                }}
-              >
-                {goalProgress >= 15 &&
-                  `${goalProgress}%`}
-              </div>
-
-            </div>
-
-            <div className="goal-status">
-
-              <div className="goal-status-icon">
-                {goalProgress === 100
-                  ? "🏆"
-                  : goalProgress > 50
-                  ? "🔥"
-                  : "🚀"}
-              </div>
-
-              <div>
-
-                <h3>
-                  {goalProgress === 100
-                    ? "Goal Achieved!"
-                    : "Your Progress"}
-                </h3>
-
-                <p>
-                  {goalStatus}
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <div className="goal-note">
-
-          💡 <strong>Note:</strong> BMI is a
-          general screening measure and should
-          not be used as the only measure of
-          individual health. Your target should
-          be appropriate for you and, when needed,
-          discussed with a qualified healthcare
-          professional.
-
-        </div>
-
-      </div>
-
-      {/* =========================
-          BMI TREND
-          ========================= */}
+      {/* BMI TREND */}
 
       <div className="bmi-trend">
 
         <div className="trend-header">
 
           <div>
-            <p>HEALTH ANALYTICS</p>
 
-            <h2>📊 BMI Trend</h2>
+            <p>
+              HEALTH ANALYTICS
+            </p>
+
+            <h2>
+              📊 BMI Trend
+            </h2>
+
           </div>
 
           <div className="trend-count">
@@ -925,7 +959,9 @@ function HealthReport()
 
           <div className="trend-empty">
 
-            <div>📊</div>
+            <div>
+              📊
+            </div>
 
             <h3>
               Your BMI Trend Will Appear Here
@@ -942,11 +978,15 @@ function HealthReport()
 
           <>
 
+            {/* SUMMARY */}
+
             <div className="trend-summary">
 
               <div className="trend-summary-card">
 
-                <span>Latest BMI</span>
+                <span>
+                  Latest BMI
+                </span>
 
                 <strong>
                   {reports[0].bmi}
@@ -960,7 +1000,9 @@ function HealthReport()
 
               <div className="trend-summary-card">
 
-                <span>Previous BMI</span>
+                <span>
+                  Previous BMI
+                </span>
 
                 <strong>
                   {reports.length > 1
@@ -978,7 +1020,9 @@ function HealthReport()
 
               <div className="trend-summary-card">
 
-                <span>BMI Change</span>
+                <span>
+                  BMI Change
+                </span>
 
                 <strong>
                   {bmiChange === null
@@ -999,9 +1043,13 @@ function HealthReport()
 
             </div>
 
+            {/* BMI SCALE */}
+
             <div className="bmi-scale-section">
 
-              <h3>BMI Range</h3>
+              <h3>
+                BMI Range
+              </h3>
 
               <div className="bmi-scale">
 
@@ -1036,14 +1084,27 @@ function HealthReport()
 
               <div className="scale-categories">
 
-                <span>Underweight</span>
-                <span>Normal</span>
-                <span>Overweight</span>
-                <span>Obesity</span>
+                <span>
+                  Underweight
+                </span>
+
+                <span>
+                  Normal
+                </span>
+
+                <span>
+                  Overweight
+                </span>
+
+                <span>
+                  Obesity
+                </span>
 
               </div>
 
             </div>
+
+            {/* TREND MESSAGE */}
 
             <div className="trend-message">
 
@@ -1053,7 +1114,9 @@ function HealthReport()
 
               <div>
 
-                <h3>BMI Progress</h3>
+                <h3>
+                  BMI Progress
+                </h3>
 
                 <p>
                   {getTrendText()}
@@ -1063,9 +1126,13 @@ function HealthReport()
 
             </div>
 
+            {/* CHART */}
+
             <div className="trend-chart">
 
-              <h3>BMI History Chart</h3>
+              <h3>
+                BMI History Chart
+              </h3>
 
               <div className="chart-area">
 
@@ -1075,7 +1142,9 @@ function HealthReport()
                   .map((report) => {
 
                     const chartBMI =
-                      Number(report.bmi);
+                      Number(
+                        report.bmi
+                      );
 
                     const minBMI = 15;
                     const maxBMI = 40;
@@ -1142,17 +1211,19 @@ function HealthReport()
 
       </div>
 
-      {/* =========================
-          DAY 24 HEALTH INSIGHTS
-          ========================= */}
+      {/* HEALTH INSIGHTS */}
 
       <div className="health-insights">
 
         <div className="insights-header">
 
-          <p>SMART HEALTH ANALYSIS</p>
+          <p>
+            SMART HEALTH ANALYSIS
+          </p>
 
-          <h2>🧠 Health Insights</h2>
+          <h2>
+            🧠 Health Insights
+          </h2>
 
           <span>
             A quick summary of your BMI
@@ -1312,9 +1383,7 @@ function HealthReport()
 
       </div>
 
-      {/* =========================
-          HEALTH HISTORY
-          ========================= */}
+      {/* HEALTH HISTORY */}
 
       <div className="health-history">
 
@@ -1433,9 +1502,7 @@ function HealthReport()
 
       </div>
 
-      {/* =========================
-          HEALTHY TIPS
-          ========================= */}
+      {/* HEALTHY TIPS */}
 
       <div className="health-tips">
 
@@ -1520,7 +1587,7 @@ function HealthReport()
 
     </section>
   );
-
+}
 
 export default HealthReport;
 
