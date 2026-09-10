@@ -58,6 +58,46 @@ Generated from MAMA Health Care.
     </div>
   );
 }
+  const generatePDF = () => {
+    // your existing PDF code
+  };
+
+  // =========================
+  // DAY 27 - SHARE REPORT
+  // =========================
+
+  const shareHealthReport = async () => {
+    const shareText = `
+MAMA Health Care - Health Report
+
+BMI: ${bmi ?? "Not calculated"}
+Category: ${category ?? "Not available"}
+Height: ${height ? `${height} cm` : "Not available"}
+Weight: ${weight ? `${weight} kg` : "Not available"}
+
+Generated from MAMA Health Care.
+    `.trim();
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "MAMA Health Care Report",
+          text: shareText,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        alert("Health report copied to clipboard!");
+      }
+    } catch (error) {
+      console.log("Share cancelled or failed:", error);
+    }
+  };
+
+  // =========================
+  // RENDER
+  // =========================
+
+  return (
 
 export default HealthReport;
 ===============
