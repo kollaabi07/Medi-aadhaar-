@@ -4,25 +4,64 @@ import jsPDF from "jspdf";
 import "./HealthReport.css";
 
 function HealthReport() {
+  // states
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-
   const [bmi, setBmi] = useState(null);
   const [category, setCategory] = useState("");
-  const [message, setMessage] = useState("");
 
-  const [saving, setSaving] = useState(false);
-  const [savedMessage, setSavedMessage] = useState("");
+  // other functions
+  const calculateBMI = () => {
+    // your existing code
+  };
 
-  const [userEmail, setUserEmail] = useState("");
+  const saveHealthReport = async () => {
+    // your existing code
+  };
 
-  const [reports, setReports] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
-  const [historyError, setHistoryError] = useState("");
+  const generatePDF = () => {
+    // your existing Day 26 code
+  };
 
-  const [generatingPDF, setGeneratingPDF] = useState(false);
+  // 👇 ADD THE DAY 27 CODE HERE
+  const shareHealthReport = async () => {
+    const shareText = `
+MAMA Health Care - Health Report
 
-  // =========================
+BMI: ${bmi ?? "Not calculated"}
+Category: ${category ?? "Not available"}
+Height: ${height ? `${height} cm` : "Not available"}
+Weight: ${weight ? `${weight} kg` : "Not available"}
+
+Generated from MAMA Health Care.
+    `.trim();
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "MAMA Health Care Report",
+          text: shareText,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        alert("Health report copied to clipboard!");
+      }
+    } catch (error) {
+      console.log("Share cancelled or failed:", error);
+    }
+  };
+
+  // 👇 RETURN COMES AFTER THE FUNCTION
+  return (
+    <div>
+      {/* your existing UI */}
+    </div>
+  );
+}
+
+export default HealthReport;
+===============
+  // ==========
   // GET LOGGED-IN USER
   // =========================
 
