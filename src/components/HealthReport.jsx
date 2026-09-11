@@ -4,104 +4,23 @@ import jsPDF from "jspdf";
 import "./HealthReport.css";
 
 function HealthReport() {
-  // states
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
+
   const [bmi, setBmi] = useState(null);
   const [category, setCategory] = useState("");
+  const [message, setMessage] = useState("");
 
-  // other functions
-  const calculateBMI = () => {
-    // your existing code
-  };
+  const [saving, setSaving] = useState(false);
+  const [savedMessage, setSavedMessage] = useState("");
 
-  const saveHealthReport = async () => {
-    // your existing code
-  };
+  const [userEmail, setUserEmail] = useState("");
 
-  const generatePDF = () => {
-    // your existing Day 26 code
-  };
-
-  // 👇 ADD THE DAY 27 CODE HERE
-  const shareHealthReport = async () => {
-    const shareText = `
-MAMA Health Care - Health Report
-
-BMI: ${bmi ?? "Not calculated"}
-Category: ${category ?? "Not available"}
-Height: ${height ? `${height} cm` : "Not available"}
-Weight: ${weight ? `${weight} kg` : "Not available"}
-
-Generated from MAMA Health Care.
-    `.trim();
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "MAMA Health Care Report",
-          text: shareText,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        alert("Health report copied to clipboard!");
-      }
-    } catch (error) {
-      console.log("Share cancelled or failed:", error);
-    }
-  };
-
-  // 👇 RETURN COMES AFTER THE FUNCTION
-  return (
-    <div>
-      {/* your existing UI */}
-    </div>
-  );
-}
-  const generatePDF = () => {
-    // your existing PDF code
-  };
+  const [reports, setReports] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState("");
 
   // =========================
-  // DAY 27 - SHARE REPORT
-  // =========================
-
-  const shareHealthReport = async () => {
-    const shareText = `
-MAMA Health Care - Health Report
-
-BMI: ${bmi ?? "Not calculated"}
-Category: ${category ?? "Not available"}
-Height: ${height ? `${height} cm` : "Not available"}
-Weight: ${weight ? `${weight} kg` : "Not available"}
-
-Generated from MAMA Health Care.
-    `.trim();
-
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "MAMA Health Care Report",
-          text: shareText,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        alert("Health report copied to clipboard!");
-      }
-    } catch (error) {
-      console.log("Share cancelled or failed:", error);
-    }
-  };
-
-  // =========================
-  // RENDER
-  // =========================
-
-  return (
-
-export default HealthReport;
-===============
-  // ==========
   // GET LOGGED-IN USER
   // =========================
 
@@ -154,7 +73,6 @@ export default HealthReport;
       setReports(data.reports || []);
     } catch (error) {
       console.log("Health history error:", error);
-
       setHistoryError(
         "Unable to load health history."
       );
@@ -177,10 +95,8 @@ export default HealthReport;
       setMessage(
         "Please enter a valid height and weight."
       );
-
       setBmi(null);
       setCategory("");
-
       return;
     }
 
@@ -196,22 +112,18 @@ export default HealthReport;
 
     if (result < 18.5) {
       finalCategory = "Underweight";
-
       healthMessage =
         "Underweight - consider a balanced and nutritious diet.";
     } else if (result < 25) {
       finalCategory = "Normal";
-
       healthMessage =
         "Normal weight - keep maintaining a healthy lifestyle.";
     } else if (result < 30) {
       finalCategory = "Overweight";
-
       healthMessage =
         "Overweight - regular exercise and balanced meals may help.";
     } else {
       finalCategory = "Obesity Range";
-
       healthMessage =
         "Obesity range - consider discussing your health with a professional.";
     }
@@ -228,7 +140,6 @@ export default HealthReport;
       setSavedMessage(
         "BMI calculated, but login is required to save the report."
       );
-
       return;
     }
 
@@ -315,7 +226,6 @@ export default HealthReport;
       );
     } catch (error) {
       console.log("Delete error:", error);
-
       alert("Unable to delete report.");
     }
   };
@@ -353,6 +263,22 @@ export default HealthReport;
 
   const bmiChange = getBMIChange();
 
+  const getTrendIcon = () => {
+    if (bmiChange === null) {
+      return "📊";
+    }
+
+    if (bmiChange > 0) {
+      return "📈";
+    }
+
+    if (bmiChange < 0) {
+      return "📉";
+    }
+
+    return "➡️";
+  };
+
   const getTrendText = () => {
     if (bmiChange === null) {
       return "Not enough data to calculate your BMI trend.";
@@ -371,24 +297,8 @@ export default HealthReport;
     return "Your BMI is unchanged from your previous report.";
   };
 
-  const getTrendIcon = () => {
-    if (bmiChange === null) {
-      return "📊";
-    }
-
-    if (bmiChange > 0) {
-      return "📈";
-    }
-
-    if (bmiChange < 0) {
-      return "📉";
-    }
-
-    return "➡️";
-  };
-
   // =========================
-  // BMI RANGE POSITION
+  // BMI POSITION
   // =========================
 
   const getBMIPosition = (value) => {
@@ -472,383 +382,143 @@ export default HealthReport;
   };
 
   // =========================
-  // DAY 26 - GENERATE PDF
+  // DAY 26 - DOWNLOAD PDF
   // =========================
 
   const generatePDF = () => {
-    if (reports.length === 0) {
-      alert(
-        "Please calculate your BMI first before downloading the report."
+    const doc = new jsPDF();
+
+    doc.setFontSize(22);
+    doc.text(
+      "MAMA Health Care",
+      20,
+      25
+    );
+
+    doc.setFontSize(16);
+    doc.text(
+      "Personal Health Report",
+      20,
+      40
+    );
+
+    doc.setFontSize(12);
+
+    doc.text(
+      `Email: ${userEmail || "Not available"}`,
+      20,
+      55
+    );
+
+    doc.text(
+      `Height: ${height || "Not available"} cm`,
+      20,
+      70
+    );
+
+    doc.text(
+      `Weight: ${weight || "Not available"} kg`,
+      20,
+      85
+    );
+
+    doc.text(
+      `BMI: ${bmi || "Not calculated"}`,
+      20,
+      100
+    );
+
+    doc.text(
+      `Category: ${category || "Not available"}`,
+      20,
+      115
+    );
+
+    doc.text(
+      "Health Message:",
+      20,
+      135
+    );
+
+    const messageLines =
+      doc.splitTextToSize(
+        message ||
+          "No health message available.",
+        160
       );
-      return;
-    }
+
+    doc.text(
+      messageLines,
+      20,
+      145
+    );
+
+    doc.text(
+      `Generated: ${new Date().toLocaleString(
+        "en-IN"
+      )}`,
+      20,
+      180
+    );
+
+    doc.setFontSize(10);
+
+    doc.text(
+      "BMI is a general screening measure and does not provide a complete picture of individual health.",
+      20,
+      200
+    );
+
+    doc.save(
+      "MAMA-Health-Report.pdf"
+    );
+  };
+
+  // =========================
+  // DAY 27 - SHARE REPORT
+  // =========================
+
+  const shareHealthReport = async () => {
+    const shareText = `
+MAMA Health Care - Health Report
+
+BMI: ${bmi ?? "Not calculated"}
+Category: ${category || "Not available"}
+Height: ${height ? `${height} cm` : "Not available"}
+Weight: ${weight ? `${weight} kg` : "Not available"}
+
+Health Message:
+${message || "Not available"}
+
+Generated from MAMA Health Care.
+    `.trim();
 
     try {
-      setGeneratingPDF(true);
-
-      const doc = new jsPDF();
-
-      const latestReport = reports[0];
-
-      const latestBMI = Number(
-        latestReport.bmi
-      );
-
-      // =========================
-      // PDF HEADER
-      // =========================
-
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
-      doc.text(
-        "MAMA HEALTH CARE",
-        20,
-        25
-      );
-
-      doc.setFontSize(16);
-      doc.setFont("helvetica", "normal");
-      doc.text(
-        "Personal Health Report",
-        20,
-        35
-      );
-
-      doc.setDrawColor(100, 100, 100);
-      doc.line(20, 42, 190, 42);
-
-      // =========================
-      // USER INFORMATION
-      // =========================
-
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-
-      doc.text(
-        "User Information",
-        20,
-        55
-      );
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(11);
-
-      doc.text(
-        `Email: ${userEmail || "Not available"}`,
-        20,
-        65
-      );
-
-      doc.text(
-        `Report Date: ${new Date().toLocaleDateString(
-          "en-IN"
-        )}`,
-        20,
-        73
-      );
-
-      // =========================
-      // CURRENT BMI
-      // =========================
-
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-
-      doc.text(
-        "Latest BMI Result",
-        20,
-        90
-      );
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-
-      doc.text(
-        `Height: ${latestReport.height} cm`,
-        20,
-        102
-      );
-
-      doc.text(
-        `Weight: ${latestReport.weight} kg`,
-        20,
-        110
-      );
-
-      doc.text(
-        `BMI: ${latestBMI}`,
-        20,
-        118
-      );
-
-      doc.text(
-        `Category: ${latestReport.category}`,
-        20,
-        126
-      );
-
-      // =========================
-      // HEALTH MESSAGE
-      // =========================
-
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-
-      doc.text(
-        "Health Information",
-        20,
-        143
-      );
-
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-
-      const pdfMessage =
-        latestReport.category ===
-        "Underweight"
-          ? "Consider maintaining a balanced and nutritious diet."
-          : latestReport.category ===
-            "Normal"
-          ? "Keep maintaining a healthy lifestyle."
-          : latestReport.category ===
-            "Overweight"
-          ? "Regular exercise and balanced meals may help."
-          : "Consider discussing your health with a qualified healthcare professional.";
-
-      const messageLines =
-        doc.splitTextToSize(
-          pdfMessage,
-          165
+      if (navigator.share) {
+        await navigator.share({
+          title: "MAMA Health Care Report",
+          text: shareText,
+        });
+      } else if (
+        navigator.clipboard
+      ) {
+        await navigator.clipboard.writeText(
+          shareText
         );
 
-      doc.text(
-        messageLines,
-        20,
-        153
-      );
-
-      // =========================
-      // BMI HISTORY
-      // =========================
-
-      let historyStartY = 175;
-
-      if (reports.length > 4) {
-        historyStartY = 180;
-      }
-
-      doc.setFontSize(13);
-      doc.setFont("helvetica", "bold");
-
-      doc.text(
-        "BMI History",
-        20,
-        historyStartY
-      );
-
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-
-      doc.text("Date", 20, historyStartY + 12);
-      doc.text("BMI", 75, historyStartY + 12);
-      doc.text(
-        "Category",
-        105,
-        historyStartY + 12
-      );
-
-      doc.setFont("helvetica", "normal");
-
-      let currentY =
-        historyStartY + 20;
-
-      reports.slice(0, 8).forEach(
-        (report) => {
-          const reportDate =
-            new Date(
-              report.createdAt
-            ).toLocaleDateString(
-              "en-IN"
-            );
-
-          doc.text(
-            reportDate,
-            20,
-            currentY
-          );
-
-          doc.text(
-            String(report.bmi),
-            75,
-            currentY
-          );
-
-          doc.text(
-            String(report.category),
-            105,
-            currentY
-          );
-
-          currentY += 9;
-        }
-      );
-
-      // =========================
-      // INSIGHTS
-      // =========================
-
-      const insightY =
-        Math.max(currentY + 12, 250);
-
-      if (insightY > 260) {
-        doc.addPage();
-
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-
-        doc.text(
-          "Health Insights",
-          20,
-          25
-        );
-
-        doc.setFontSize(11);
-        doc.setFont("helvetica", "normal");
-
-        doc.text(
-          `Average BMI: ${getAverageBMI()}`,
-          20,
-          40
-        );
-
-        doc.text(
-          `Lowest BMI: ${getLowestBMI()}`,
-          20,
-          49
-        );
-
-        doc.text(
-          `Highest BMI: ${getHighestBMI()}`,
-          20,
-          58
-        );
-
-        doc.text(
-          `Total Reports: ${reports.length}`,
-          20,
-          67
-        );
-
-        const insightLines =
-          doc.splitTextToSize(
-            getOverallInsight(),
-            165
-          );
-
-        doc.text(
-          insightLines,
-          20,
-          82
+        alert(
+          "Health report copied to clipboard!"
         );
       } else {
-        doc.setFontSize(13);
-        doc.setFont("helvetica", "bold");
-
-        doc.text(
-          "Health Insights",
-          20,
-          insightY
-        );
-
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-
-        doc.text(
-          `Average BMI: ${getAverageBMI()}`,
-          20,
-          insightY + 12
-        );
-
-        doc.text(
-          `Lowest BMI: ${getLowestBMI()}`,
-          75,
-          insightY + 12
-        );
-
-        doc.text(
-          `Highest BMI: ${getHighestBMI()}`,
-          130,
-          insightY + 12
-        );
-
-        const insightLines =
-          doc.splitTextToSize(
-            getOverallInsight(),
-            165
-          );
-
-        doc.text(
-          insightLines,
-          20,
-          insightY + 25
+        alert(
+          "Sharing is not supported on this browser."
         );
       }
-
-      // =========================
-      // FOOTER
-      // =========================
-
-      const pageCount =
-        doc.internal.getNumberOfPages();
-
-      for (
-        let page = 1;
-        page <= pageCount;
-        page++
-      ) {
-        doc.setPage(page);
-
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-
-        doc.text(
-          "MAMA Health Care - Generated Health Report",
-          20,
-          285
-        );
-
-        doc.text(
-          `Page ${page} of ${pageCount}`,
-          165,
-          285
-        );
-      }
-
-      // =========================
-      // DOWNLOAD
-      // =========================
-
-      const fileName =
-        `MAMA-Health-Report-${new Date()
-          .toISOString()
-          .slice(0, 10)}.pdf`;
-
-      doc.save(fileName);
-
-      setSavedMessage(
-        "✅ PDF health report downloaded successfully!"
-      );
     } catch (error) {
       console.log(
-        "PDF generation error:",
+        "Share cancelled or failed:",
         error
       );
-
-      alert(
-        "Unable to generate PDF report."
-      );
-    } finally {
-      setGeneratingPDF(false);
     }
   };
 
@@ -874,16 +544,14 @@ export default HealthReport;
         </span>
       </div>
 
-      {/* BMI SECTION */}
+      {/* BMI CALCULATOR */}
 
       <div className="report-container">
-
-        {/* CALCULATOR */}
 
         <div className="bmi-card">
 
           <div className="report-icon">
-            {"\u2696\uFE0F"}
+            ⚖️
           </div>
 
           <h2>
@@ -956,18 +624,14 @@ export default HealthReport;
         <div className="result-card">
 
           <div className="result-orb">
-            {"\u2764\uFE0F"}
+            ❤️
           </div>
 
-          <p>
-            YOUR BMI
-          </p>
+          <p>YOUR BMI</p>
 
           {bmi ? (
             <>
-              <h2>
-                {bmi}
-              </h2>
+              <h2>{bmi}</h2>
 
               <div className="bmi-status">
                 {category}
@@ -976,25 +640,10 @@ export default HealthReport;
               <span className="health-message">
                 {message}
               </span>
-
-              {/* DAY 26 PDF BUTTON */}
-
-              <button
-                className="pdf-btn"
-                onClick={generatePDF}
-                disabled={generatingPDF}
-              >
-                {generatingPDF
-                  ? "Generating PDF..."
-                  : "📄 Download PDF Report"}
-              </button>
-
             </>
           ) : (
             <>
-              <h2>
-                --
-              </h2>
+              <h2>--</h2>
 
               <span className="health-message">
                 Enter your details to see
@@ -1007,6 +656,26 @@ export default HealthReport;
 
       </div>
 
+      {/* REPORT ACTIONS */}
+
+      <div className="report-actions">
+
+        <button
+          className="download-report-btn"
+          onClick={generatePDF}
+        >
+          📄 Download PDF Report
+        </button>
+
+        <button
+          className="share-report-btn"
+          onClick={shareHealthReport}
+        >
+          📤 Share Health Report
+        </button>
+
+      </div>
+
       {/* BMI TREND */}
 
       <div className="bmi-trend">
@@ -1014,7 +683,6 @@ export default HealthReport;
         <div className="trend-header">
 
           <div>
-
             <p>
               HEALTH ANALYTICS
             </p>
@@ -1022,7 +690,6 @@ export default HealthReport;
             <h2>
               📊 BMI Trend
             </h2>
-
           </div>
 
           <div className="trend-count">
@@ -1038,9 +705,7 @@ export default HealthReport;
 
           <div className="trend-empty">
 
-            <div>
-              📊
-            </div>
+            <div>📊</div>
 
             <h3>
               Your BMI Trend Will Appear Here
@@ -1150,35 +815,20 @@ export default HealthReport;
                 </div>
 
                 <div className="scale-labels">
-
                   <span>15</span>
                   <span>18.5</span>
                   <span>25</span>
                   <span>30</span>
                   <span>40</span>
-
                 </div>
 
               </div>
 
               <div className="scale-categories">
-
-                <span>
-                  Underweight
-                </span>
-
-                <span>
-                  Normal
-                </span>
-
-                <span>
-                  Overweight
-                </span>
-
-                <span>
-                  Obesity
-                </span>
-
+                <span>Underweight</span>
+                <span>Normal</span>
+                <span>Overweight</span>
+                <span>Obesity</span>
               </div>
 
             </div>
@@ -1221,9 +871,7 @@ export default HealthReport;
                   .map((report) => {
 
                     const chartBMI =
-                      Number(
-                        report.bmi
-                      );
+                      Number(report.bmi);
 
                     const minBMI = 15;
                     const maxBMI = 40;
@@ -1325,7 +973,7 @@ export default HealthReport;
 
             <p>
               Calculate your BMI to generate
-              personalized health insights.
+              health insights.
             </p>
 
           </div>
@@ -1586,17 +1234,13 @@ export default HealthReport;
       <div className="health-tips">
 
         <h2>
-          {"\uD83D\uDCA1"} Healthy
-          Lifestyle Tips
+          💡 Healthy Lifestyle Tips
         </h2>
 
         <div className="tips-grid">
 
           <div className="tip">
-
-            <span>
-              {"\uD83D\uDCA7"}
-            </span>
+            <span>💧</span>
 
             <h3>
               Stay Hydrated
@@ -1606,14 +1250,10 @@ export default HealthReport;
               Drink enough water throughout
               the day.
             </p>
-
           </div>
 
           <div className="tip">
-
-            <span>
-              {"\uD83C\uDFC3"}
-            </span>
+            <span>🏃</span>
 
             <h3>
               Stay Active
@@ -1623,14 +1263,10 @@ export default HealthReport;
               Include regular physical
               activity in your routine.
             </p>
-
           </div>
 
           <div className="tip">
-
-            <span>
-              {"\uD83E\uDD57"}
-            </span>
+            <span>🥗</span>
 
             <h3>
               Eat Balanced
@@ -1640,14 +1276,10 @@ export default HealthReport;
               Choose a variety of
               nutritious foods.
             </p>
-
           </div>
 
           <div className="tip">
-
-            <span>
-              {"\uD83D\uDE34"}
-            </span>
+            <span>😴</span>
 
             <h3>
               Sleep Well
@@ -1657,7 +1289,6 @@ export default HealthReport;
               Give your body enough time
               to rest.
             </p>
-
           </div>
 
         </div>
@@ -1669,4 +1300,3 @@ export default HealthReport;
 }
 
 export default HealthReport;
-
