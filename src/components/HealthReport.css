@@ -1,16 +1,19 @@
 
+/* =========================
+   HEALTH REPORT
+   ========================= */
+
 .health-report {
+  width: 100%;
   min-height: 100vh;
   padding: 60px 7%;
-  background:
-    radial-gradient(circle at top left, #e8f8ff, transparent 35%),
-    linear-gradient(135deg, #f7fbff, #eef6f9);
-  color: #17324d;
+  background: #f6f9fc;
+  box-sizing: border-box;
 }
 
 /* =========================
    HEADER
-========================= */
+   ========================= */
 
 .report-header {
   text-align: center;
@@ -19,84 +22,87 @@
 
 .report-header p {
   margin: 0 0 10px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 3px;
-  color: #2c91a5;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #168aad;
 }
 
 .report-header h1 {
   margin: 0;
   font-size: 42px;
+  color: #12304a;
   font-weight: 800;
 }
 
 .report-header span {
   display: block;
   margin-top: 12px;
-  color: #667b8c;
+  color: #657789;
   font-size: 16px;
 }
 
 /* =========================
-   MAIN BMI SECTION
-========================= */
+   CALCULATOR + RESULT
+   ========================= */
 
 .report-container {
   max-width: 1100px;
-  margin: auto;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  gap: 25px;
 }
-
-/* =========================
-   BMI CARD
-========================= */
 
 .bmi-card,
 .result-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid #dbeaf0;
-  border-radius: 25px;
+  background: #ffffff;
+  border-radius: 24px;
   padding: 35px;
-  box-shadow: 0 18px 50px rgba(30, 75, 100, 0.08);
+  box-shadow: 0 15px 40px rgba(28, 57, 77, 0.08);
+  box-sizing: border-box;
+}
+
+.bmi-card {
+  border: 1px solid #e5edf3;
 }
 
 .report-icon {
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 18px;
-  background: #e5f7fa;
-  font-size: 28px;
+  background: #e8f7fb;
+  font-size: 30px;
+  margin-bottom: 20px;
 }
 
-.bmi-card h2,
-.result-card h2 {
-  margin: 18px 0 10px;
-  font-size: 27px;
+.bmi-card h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #173b56;
 }
 
 .bmi-card > p {
-  color: #718596;
+  color: #718294;
   line-height: 1.6;
+  margin-bottom: 28px;
 }
 
 /* =========================
    INPUTS
-========================= */
+   ========================= */
 
 .input-group {
-  margin-top: 22px;
+  margin-bottom: 20px;
 }
 
 .input-group label {
   display: block;
   margin-bottom: 8px;
-  font-size: 14px;
+  color: #29465d;
   font-weight: 700;
 }
 
@@ -104,40 +110,38 @@
   width: 100%;
   box-sizing: border-box;
   padding: 14px 16px;
-  border: 1px solid #d5e5eb;
+  border: 1px solid #d8e4ec;
   border-radius: 12px;
   outline: none;
-  font-size: 15px;
-  background: #fafdff;
+  font-size: 16px;
+  background: #fbfdff;
   transition: 0.2s;
 }
 
 .input-group input:focus {
-  border-color: #2c91a5;
-  box-shadow: 0 0 0 4px rgba(44, 145, 165, 0.1);
+  border-color: #168aad;
+  box-shadow: 0 0 0 3px rgba(22, 138, 173, 0.1);
 }
 
 /* =========================
-   BUTTON
-========================= */
+   BUTTONS
+   ========================= */
 
 .calculate-btn {
   width: 100%;
-  margin-top: 25px;
   padding: 15px;
   border: none;
-  border-radius: 13px;
-  background: #247f91;
+  border-radius: 12px;
+  background: #168aad;
   color: white;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.25s;
+  transition: 0.2s;
 }
 
 .calculate-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(36, 127, 145, 0.25);
 }
 
 .calculate-btn:disabled {
@@ -147,104 +151,117 @@
 
 /* =========================
    SAVED MESSAGE
-========================= */
+   ========================= */
 
 .saved-message {
-  margin-top: 15px;
+  margin: 15px 0 0;
   padding: 12px;
   border-radius: 10px;
-  background: #edf9f1;
-  color: #28733d;
+  background: #edf9f2;
+  color: #25804d;
   font-size: 14px;
-  line-height: 1.5;
+  text-align: center;
+}
+
+/* =========================
+   DAY 28 REPORT ACTIONS
+   ========================= */
+
+.report-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.share-report-btn,
+.download-report-btn {
+  border: none;
+  padding: 13px 10px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.share-report-btn {
+  background: #e8f7fb;
+  color: #11789a;
+}
+
+.download-report-btn {
+  background: #173b56;
+  color: white;
+}
+
+.share-report-btn:hover,
+.download-report-btn:hover {
+  transform: translateY(-2px);
 }
 
 /* =========================
    RESULT CARD
-========================= */
+   ========================= */
 
 .result-card {
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  min-height: 430px;
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    #eef9fc
+  );
 }
 
 .result-orb {
-  width: 80px;
-  height: 80px;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: #e8f8fa;
-  font-size: 34px;
-  box-shadow: 0 10px 30px rgba(44, 145, 165, 0.15);
+  background: #e6f6fa;
+  font-size: 35px;
+  margin-bottom: 20px;
 }
 
 .result-card > p {
-  margin-top: 25px;
-  margin-bottom: 5px;
-  font-size: 12px;
+  margin: 0;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 2px;
-  color: #75909f;
+  color: #7290a3;
 }
 
 .result-card h2 {
-  margin: 5px 0;
-  font-size: 55px;
-  color: #247f91;
+  margin: 10px 0;
+  font-size: 58px;
+  color: #173b56;
 }
 
 .bmi-status {
-  display: inline-block;
-  margin-top: 10px;
   padding: 8px 18px;
   border-radius: 30px;
-  background: #e6f6f7;
-  color: #247f91;
+  background: #e8f7fb;
+  color: #168aad;
   font-weight: 700;
+  margin-bottom: 15px;
 }
 
 .health-message {
-  max-width: 390px;
-  margin-top: 18px;
-  color: #687e8d;
+  max-width: 350px;
+  color: #667b8b;
   line-height: 1.6;
 }
 
 /* =========================
-   PDF BUTTON - DAY 26
-========================= */
-
-.pdf-btn {
-  margin-top: 25px;
-  padding: 14px 22px;
-  border: none;
-  border-radius: 12px;
-  background: #17324d;
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.pdf-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(23, 50, 77, 0.25);
-}
-
-.pdf-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* =========================
    BMI TREND
-========================= */
+   ========================= */
 
 .bmi-trend,
 .health-insights,
@@ -252,224 +269,230 @@
 .health-tips {
   max-width: 1100px;
   margin: 35px auto 0;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid #dbeaf0;
-  border-radius: 25px;
-  padding: 30px;
-  box-shadow: 0 18px 50px rgba(30, 75, 100, 0.06);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px;
+  box-sizing: border-box;
+  box-shadow: 0 15px 40px rgba(28, 57, 77, 0.07);
 }
 
 .trend-header,
 .history-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 20px;
 }
 
 .trend-header p,
 .insights-header p {
-  margin: 0;
-  font-size: 11px;
-  letter-spacing: 2px;
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 1.8px;
   font-weight: 800;
-  color: #2c91a5;
+  color: #168aad;
 }
 
 .trend-header h2,
 .history-header h2,
-.health-tips h2,
-.insights-header h2 {
-  margin: 7px 0 0;
-  font-size: 26px;
+.health-tips h2 {
+  margin: 0;
+  color: #173b56;
 }
 
 .trend-count {
-  padding: 10px 16px;
+  background: #eef8fb;
+  color: #168aad;
+  padding: 9px 15px;
   border-radius: 30px;
-  background: #edf8fa;
-  color: #247f91;
   font-weight: 700;
 }
 
 /* =========================
-   TREND SUMMARY
-========================= */
-
-.trend-summary {
-  margin-top: 25px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.trend-summary-card {
-  padding: 22px;
-  border-radius: 17px;
-  background: #f7fbfd;
-  border: 1px solid #e2eef2;
-}
-
-.trend-summary-card span {
-  display: block;
-  font-size: 13px;
-  color: #728795;
-}
-
-.trend-summary-card strong {
-  display: block;
-  margin: 8px 0;
-  font-size: 30px;
-  color: #247f91;
-}
-
-.trend-summary-card small {
-  color: #718593;
-}
-
-/* =========================
-   EMPTY
-========================= */
+   EMPTY STATES
+   ========================= */
 
 .trend-empty,
 .insights-empty,
 .history-empty {
   text-align: center;
   padding: 50px 20px;
-  color: #718593;
+  color: #718294;
 }
 
 .trend-empty > div,
 .insights-empty-icon,
 .empty-icon {
-  font-size: 40px;
+  font-size: 45px;
+  margin-bottom: 12px;
 }
 
 .trend-empty h3,
 .insights-empty h3 {
-  color: #304c61;
+  color: #29465d;
+  margin-bottom: 8px;
+}
+
+/* =========================
+   TREND SUMMARY
+   ========================= */
+
+.trend-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.trend-summary-card {
+  padding: 22px;
+  border: 1px solid #e5edf3;
+  border-radius: 18px;
+  background: #fbfdff;
+}
+
+.trend-summary-card span {
+  display: block;
+  color: #758898;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.trend-summary-card strong {
+  display: block;
+  color: #173b56;
+  font-size: 30px;
+  margin-bottom: 5px;
+}
+
+.trend-summary-card small {
+  color: #168aad;
 }
 
 /* =========================
    BMI SCALE
-========================= */
+   ========================= */
 
 .bmi-scale-section {
-  margin-top: 30px;
+  margin-top: 35px;
 }
 
 .bmi-scale-section h3 {
-  margin-bottom: 20px;
+  color: #29465d;
+}
+
+.bmi-scale {
+  margin-top: 30px;
 }
 
 .scale-track {
-  position: relative;
   height: 18px;
   border-radius: 20px;
-  background:
-    linear-gradient(
-      90deg,
-      #8fc4d2 0%,
-      #8fc4d2 14%,
-      #70bda8 14%,
-      #70bda8 40%,
-      #e5c76b 40%,
-      #e5c76b 60%,
-      #d98686 60%,
-      #d98686 100%
-    );
+  background: linear-gradient(
+    90deg,
+    #7ec8e3 0%,
+    #7ec8e3 14%,
+    #75c98d 14%,
+    #75c98d 40%,
+    #f1c75b 40%,
+    #f1c75b 60%,
+    #e88989 60%,
+    #e88989 100%
+  );
+  position: relative;
 }
 
 .scale-marker {
   position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 24px;
-  height: 24px;
-  border: 4px solid white;
+  top: -13px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: #17324d;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  background: #173b56;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 15px rgba(23, 59, 86, 0.25);
 }
 
 .scale-marker span {
-  position: absolute;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 5px 9px;
-  border-radius: 7px;
-  background: #17324d;
   color: white;
-  font-size: 12px;
-  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 800;
 }
 
-.scale-labels {
+.scale-labels,
+.scale-categories {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 12px;
+  color: #7b8d9b;
   font-size: 12px;
-  color: #7a8d99;
 }
 
 .scale-categories {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  margin-top: 12px;
-  font-size: 11px;
-  text-align: center;
-  color: #708491;
+  font-weight: 700;
+  font-size: 13px;
 }
 
 /* =========================
    TREND MESSAGE
-========================= */
+   ========================= */
 
-.trend-message {
+.trend-message,
+.overall-insight,
+.health-reminder {
   display: flex;
+  gap: 18px;
   align-items: flex-start;
-  gap: 15px;
   margin-top: 30px;
   padding: 20px;
-  border-radius: 16px;
-  background: #f3fafb;
+  border-radius: 18px;
+  background: #f4fafc;
 }
 
-.trend-message > span {
-  font-size: 25px;
+.trend-message > span,
+.insight-icon,
+.reminder-icon {
+  font-size: 28px;
 }
 
-.trend-message h3 {
+.trend-message h3,
+.overall-insight h3,
+.health-reminder h3 {
   margin: 0 0 6px;
+  color: #29465d;
 }
 
-.trend-message p {
+.trend-message p,
+.overall-insight p,
+.health-reminder p {
   margin: 0;
-  color: #687e8c;
+  color: #6e8190;
   line-height: 1.6;
 }
 
 /* =========================
    CHART
-========================= */
+   ========================= */
 
 .trend-chart {
-  margin-top: 30px;
+  margin-top: 35px;
+}
+
+.trend-chart h3 {
+  color: #29465d;
 }
 
 .chart-area {
-  height: 250px;
-  margin-top: 20px;
-  padding: 20px;
+  height: 260px;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
   gap: 18px;
   overflow-x: auto;
-  border-radius: 15px;
-  background: #f8fbfc;
-  border: 1px solid #e2edf1;
+  padding: 25px 15px 0;
+  border-bottom: 1px solid #dfe8ee;
 }
 
 .chart-column {
@@ -477,134 +500,122 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .chart-value {
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 700;
+  color: #173b56;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 7px;
 }
 
 .chart-bar {
-  width: 35px;
-  min-height: 15px;
-  border-radius: 8px 8px 3px 3px;
-  background: #247f91;
+  width: 38px;
+  min-height: 20px;
+  border-radius: 8px 8px 0 0;
+  background: #168aad;
 }
 
 .chart-column small {
   margin-top: 8px;
-  font-size: 10px;
-  color: #718593;
+  color: #7b8d9b;
+  white-space: nowrap;
 }
 
 /* =========================
-   INSIGHTS
-========================= */
+   HEALTH INSIGHTS
+   ========================= */
 
 .insights-header {
   text-align: center;
 }
 
+.insights-header h2 {
+  margin: 0;
+  color: #173b56;
+  font-size: 28px;
+}
+
 .insights-header span {
   display: block;
   margin-top: 8px;
-  color: #718593;
+  color: #758898;
 }
 
 .insights-grid {
-  margin-top: 25px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
+  gap: 16px;
+  margin-top: 30px;
 }
 
 .insight-card {
   padding: 22px;
-  border-radius: 17px;
-  background: #f7fbfd;
-  border: 1px solid #e2edf1;
+  border: 1px solid #e4edf2;
+  border-radius: 18px;
+  text-align: center;
+  background: #fbfdff;
 }
 
 .insight-card-icon {
-  font-size: 25px;
-  margin-bottom: 12px;
+  font-size: 27px;
+  margin-bottom: 10px;
 }
 
 .insight-card span {
   display: block;
-  color: #718593;
+  color: #7b8d9b;
   font-size: 13px;
 }
 
 .insight-card strong {
   display: block;
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 27px;
-  color: #247f91;
+  color: #173b56;
 }
 
-.overall-insight,
 .health-reminder {
-  display: flex;
-  gap: 15px;
-  align-items: flex-start;
-  margin-top: 20px;
-  padding: 20px;
-  border-radius: 17px;
-  background: #f4fafb;
+  background: #fff9ed;
 }
 
-.insight-icon,
-.reminder-icon {
-  font-size: 25px;
-}
-
-.overall-insight h3,
-.health-reminder h3 {
-  margin: 0 0 7px;
-}
-
-.overall-insight p,
 .health-reminder p {
-  margin: 0;
-  color: #687e8c;
-  line-height: 1.6;
+  color: #76694f;
 }
 
 /* =========================
    HEALTH HISTORY
-========================= */
+   ========================= */
 
 .history-header button {
+  border: none;
+  background: #168aad;
+  color: white;
   padding: 10px 18px;
-  border: 1px solid #cfe0e7;
   border-radius: 10px;
-  background: white;
-  color: #247f91;
   font-weight: 700;
   cursor: pointer;
 }
 
 .history-header button:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .history-error {
+  margin-top: 20px;
   padding: 12px;
   border-radius: 10px;
-  background: #fff1f1;
-  color: #b64b4b;
+  background: #fff0f0;
+  color: #c44c4c;
 }
 
 .history-list {
-  margin-top: 25px;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  margin-top: 25px;
 }
 
 .history-card {
@@ -612,21 +623,21 @@
   align-items: center;
   gap: 20px;
   padding: 20px;
-  border: 1px solid #dfebef;
+  border: 1px solid #e4edf2;
   border-radius: 17px;
-  background: #fbfdfe;
+  background: #fbfdff;
 }
 
 .history-number {
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: #e8f6f8;
-  color: #247f91;
+  border-radius: 14px;
+  background: #e8f7fb;
+  color: #168aad;
   font-weight: 800;
 }
 
@@ -635,7 +646,8 @@
 }
 
 .history-info h3 {
-  margin: 0 0 7px;
+  margin: 0 0 8px;
+  color: #173b56;
 }
 
 .history-category {
@@ -643,91 +655,89 @@
   margin-bottom: 10px;
   padding: 5px 10px;
   border-radius: 20px;
-  background: #eaf7f8;
-  color: #247f91;
+  background: #eef8fb;
+  color: #168aad;
   font-size: 12px;
   font-weight: 700;
 }
 
 .history-info p {
-  margin: 4px 0;
-  color: #6f8390;
+  margin: 5px 0;
+  color: #6f8291;
   font-size: 14px;
 }
 
 .history-info small {
   display: block;
   margin-top: 8px;
-  color: #8a9ba4;
+  color: #8797a3;
 }
 
 .delete-report-btn {
-  padding: 10px 14px;
   border: none;
+  padding: 10px 15px;
   border-radius: 10px;
   background: #fff0f0;
-  color: #b74c4c;
+  color: #c54d4d;
   font-weight: 700;
   cursor: pointer;
 }
 
 /* =========================
    HEALTH TIPS
-========================= */
+   ========================= */
 
 .health-tips h2 {
   text-align: center;
+  margin-bottom: 25px;
 }
 
 .tips-grid {
-  margin-top: 25px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
+  gap: 16px;
 }
 
 .tip {
   padding: 22px;
   text-align: center;
-  border-radius: 17px;
-  background: #f7fbfd;
-  border: 1px solid #e2edf1;
+  border: 1px solid #e4edf2;
+  border-radius: 18px;
+  background: #fbfdff;
 }
 
-.tip span {
+.tip > span {
   font-size: 30px;
 }
 
 .tip h3 {
   margin: 12px 0 7px;
+  color: #29465d;
 }
 
 .tip p {
   margin: 0;
-  color: #718593;
+  color: #778995;
   font-size: 14px;
   line-height: 1.5;
 }
 
 /* =========================
    RESPONSIVE
-========================= */
+   ========================= */
 
 @media (max-width: 900px) {
   .report-container {
     grid-template-columns: 1fr;
   }
 
-  .insights-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .tips-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .trend-summary {
     grid-template-columns: 1fr;
+  }
+
+  .insights-grid,
+  .tips-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -746,13 +756,22 @@
   .health-insights,
   .health-history,
   .health-tips {
-    padding: 20px;
-    border-radius: 18px;
+    padding: 22px;
+  }
+
+  .report-actions {
+    grid-template-columns: 1fr;
   }
 
   .insights-grid,
   .tips-grid {
     grid-template-columns: 1fr;
+  }
+
+  .trend-header,
+  .history-header {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .history-card {
@@ -764,14 +783,7 @@
     width: 100%;
   }
 
-  .trend-header,
-  .history-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .scale-categories {
-    font-size: 9px;
+    font-size: 10px;
   }
 }
-

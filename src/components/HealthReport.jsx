@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import "./HealthReport.css";
@@ -73,6 +72,7 @@ function HealthReport() {
       setReports(data.reports || []);
     } catch (error) {
       console.log("Health history error:", error);
+
       setHistoryError(
         "Unable to load health history."
       );
@@ -95,8 +95,10 @@ function HealthReport() {
       setMessage(
         "Please enter a valid height and weight."
       );
+
       setBmi(null);
       setCategory("");
+
       return;
     }
 
@@ -112,18 +114,22 @@ function HealthReport() {
 
     if (result < 18.5) {
       finalCategory = "Underweight";
+
       healthMessage =
         "Underweight - consider a balanced and nutritious diet.";
     } else if (result < 25) {
       finalCategory = "Normal";
+
       healthMessage =
         "Normal weight - keep maintaining a healthy lifestyle.";
     } else if (result < 30) {
       finalCategory = "Overweight";
+
       healthMessage =
         "Overweight - regular exercise and balanced meals may help.";
     } else {
       finalCategory = "Obesity Range";
+
       healthMessage =
         "Obesity range - consider discussing your health with a professional.";
     }
@@ -140,6 +146,7 @@ function HealthReport() {
       setSavedMessage(
         "BMI calculated, but login is required to save the report."
       );
+
       return;
     }
 
@@ -150,9 +157,11 @@ function HealthReport() {
         "http://localhost:5000/api/health-report",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify({
             email: userEmail,
             height: h,
@@ -226,6 +235,7 @@ function HealthReport() {
       );
     } catch (error) {
       console.log("Delete error:", error);
+
       alert("Unable to delete report.");
     }
   };
@@ -263,22 +273,6 @@ function HealthReport() {
 
   const bmiChange = getBMIChange();
 
-  const getTrendIcon = () => {
-    if (bmiChange === null) {
-      return "📊";
-    }
-
-    if (bmiChange > 0) {
-      return "📈";
-    }
-
-    if (bmiChange < 0) {
-      return "📉";
-    }
-
-    return "➡️";
-  };
-
   const getTrendText = () => {
     if (bmiChange === null) {
       return "Not enough data to calculate your BMI trend.";
@@ -297,8 +291,24 @@ function HealthReport() {
     return "Your BMI is unchanged from your previous report.";
   };
 
+  const getTrendIcon = () => {
+    if (bmiChange === null) {
+      return "📊";
+    }
+
+    if (bmiChange > 0) {
+      return "📈";
+    }
+
+    if (bmiChange < 0) {
+      return "📉";
+    }
+
+    return "➡️";
+  };
+
   // =========================
-  // BMI POSITION
+  // BMI RANGE POSITION
   // =========================
 
   const getBMIPosition = (value) => {
@@ -382,100 +392,7 @@ function HealthReport() {
   };
 
   // =========================
-  // DAY 26 - DOWNLOAD PDF
-  // =========================
-
-  const generatePDF = () => {
-    const doc = new jsPDF();
-
-    doc.setFontSize(22);
-    doc.text(
-      "MAMA Health Care",
-      20,
-      25
-    );
-
-    doc.setFontSize(16);
-    doc.text(
-      "Personal Health Report",
-      20,
-      40
-    );
-
-    doc.setFontSize(12);
-
-    doc.text(
-      `Email: ${userEmail || "Not available"}`,
-      20,
-      55
-    );
-
-    doc.text(
-      `Height: ${height || "Not available"} cm`,
-      20,
-      70
-    );
-
-    doc.text(
-      `Weight: ${weight || "Not available"} kg`,
-      20,
-      85
-    );
-
-    doc.text(
-      `BMI: ${bmi || "Not calculated"}`,
-      20,
-      100
-    );
-
-    doc.text(
-      `Category: ${category || "Not available"}`,
-      20,
-      115
-    );
-
-    doc.text(
-      "Health Message:",
-      20,
-      135
-    );
-
-    const messageLines =
-      doc.splitTextToSize(
-        message ||
-          "No health message available.",
-        160
-      );
-
-    doc.text(
-      messageLines,
-      20,
-      145
-    );
-
-    doc.text(
-      `Generated: ${new Date().toLocaleString(
-        "en-IN"
-      )}`,
-      20,
-      180
-    );
-
-    doc.setFontSize(10);
-
-    doc.text(
-      "BMI is a general screening measure and does not provide a complete picture of individual health.",
-      20,
-      200
-    );
-
-    doc.save(
-      "MAMA-Health-Report.pdf"
-    );
-  };
-
-  // =========================
-  // DAY 27 - SHARE REPORT
+  // SHARE HEALTH REPORT
   // =========================
 
   const shareHealthReport = async () => {
@@ -487,9 +404,6 @@ Category: ${category || "Not available"}
 Height: ${height ? `${height} cm` : "Not available"}
 Weight: ${weight ? `${weight} kg` : "Not available"}
 
-Health Message:
-${message || "Not available"}
-
 Generated from MAMA Health Care.
     `.trim();
 
@@ -499,9 +413,7 @@ Generated from MAMA Health Care.
           title: "MAMA Health Care Report",
           text: shareText,
         });
-      } else if (
-        navigator.clipboard
-      ) {
+      } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(
           shareText
         );
@@ -520,6 +432,261 @@ Generated from MAMA Health Care.
         error
       );
     }
+  };
+
+  // =========================
+  // DAY 28 - DOWNLOAD PDF
+  // =========================
+
+  const downloadHealthReport = () => {
+    if (!bmi && reports.length === 0) {
+      alert(
+        "Please calculate your BMI before downloading the report."
+      );
+
+      return;
+    }
+
+    const pdf = new jsPDF();
+
+    const latestReport =
+      reports.length > 0
+        ? reports[0]
+        : null;
+
+    const pdfBMI =
+      bmi ?? latestReport?.bmi ?? "--";
+
+    const pdfCategory =
+      category ||
+      latestReport?.category ||
+      "Not available";
+
+    const pdfHeight =
+      height ||
+      latestReport?.height ||
+      "--";
+
+    const pdfWeight =
+      weight ||
+      latestReport?.weight ||
+      "--";
+
+    // =========================
+    // PDF HEADER
+    // =========================
+
+    pdf.setFontSize(22);
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      "MAMA HEALTH CARE",
+      20,
+      25
+    );
+
+    pdf.setFontSize(16);
+    pdf.setFont("helvetica", "normal");
+
+    pdf.text(
+      "Personal Health Report",
+      20,
+      36
+    );
+
+    pdf.setLineWidth(0.5);
+
+    pdf.line(
+      20,
+      42,
+      190,
+      42
+    );
+
+    // =========================
+    // BASIC INFORMATION
+    // =========================
+
+    pdf.setFontSize(14);
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      "Current Health Information",
+      20,
+      55
+    );
+
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "normal");
+
+    pdf.text(
+      `BMI: ${pdfBMI}`,
+      25,
+      68
+    );
+
+    pdf.text(
+      `Category: ${pdfCategory}`,
+      25,
+      78
+    );
+
+    pdf.text(
+      `Height: ${pdfHeight} cm`,
+      25,
+      88
+    );
+
+    pdf.text(
+      `Weight: ${pdfWeight} kg`,
+      25,
+      98
+    );
+
+    pdf.text(
+      `Email: ${userEmail || "Not available"}`,
+      25,
+      108
+    );
+
+    // =========================
+    // HEALTH MESSAGE
+    // =========================
+
+    pdf.setFontSize(14);
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      "Health Message",
+      20,
+      125
+    );
+
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal");
+
+    const healthText =
+      message ||
+      "Maintain a balanced lifestyle and monitor your health regularly.";
+
+    const healthLines =
+      pdf.splitTextToSize(
+        healthText,
+        165
+      );
+
+    pdf.text(
+      healthLines,
+      25,
+      137
+    );
+
+    // =========================
+    // HEALTH ANALYTICS
+    // =========================
+
+    pdf.setFontSize(14);
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      "Health Analytics",
+      20,
+      160
+    );
+
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal");
+
+    pdf.text(
+      `Total Reports: ${reports.length}`,
+      25,
+      173
+    );
+
+    pdf.text(
+      `Average BMI: ${getAverageBMI()}`,
+      25,
+      183
+    );
+
+    pdf.text(
+      `Lowest BMI: ${getLowestBMI()}`,
+      25,
+      193
+    );
+
+    pdf.text(
+      `Highest BMI: ${getHighestBMI()}`,
+      25,
+      203
+    );
+
+    pdf.text(
+      `BMI Change: ${
+        bmiChange === null
+          ? "--"
+          : bmiChange > 0
+          ? `+${bmiChange}`
+          : bmiChange
+      }`,
+      25,
+      213
+    );
+
+    // =========================
+    // TREND
+    // =========================
+
+    pdf.setFontSize(14);
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+      "BMI Progress",
+      20,
+      230
+    );
+
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal");
+
+    const trendText =
+      getTrendText();
+
+    const trendLines =
+      pdf.splitTextToSize(
+        trendText,
+        165
+      );
+
+    pdf.text(
+      trendLines,
+      25,
+      242
+    );
+
+    // =========================
+    // FOOTER
+    // =========================
+
+    pdf.setFontSize(9);
+
+    pdf.text(
+      "Generated by MAMA Health Care",
+      20,
+      280
+    );
+
+    pdf.text(
+      `Generated on: ${new Date().toLocaleString(
+        "en-IN"
+      )}`,
+      20,
+      287
+    );
+
+    pdf.save(
+      "MAMA-Health-Care-Report.pdf"
+    );
   };
 
   // =========================
@@ -544,14 +711,16 @@ Generated from MAMA Health Care.
         </span>
       </div>
 
-      {/* BMI CALCULATOR */}
+      {/* BMI SECTION */}
 
       <div className="report-container">
+
+        {/* CALCULATOR */}
 
         <div className="bmi-card">
 
           <div className="report-icon">
-            ⚖️
+            {"\u2696\uFE0F"}
           </div>
 
           <h2>
@@ -617,6 +786,26 @@ Generated from MAMA Health Care.
             </p>
           )}
 
+          {/* DAY 28 BUTTONS */}
+
+          <div className="report-actions">
+
+            <button
+              className="share-report-btn"
+              onClick={shareHealthReport}
+            >
+              📤 Share Report
+            </button>
+
+            <button
+              className="download-report-btn"
+              onClick={downloadHealthReport}
+            >
+              📄 Download PDF
+            </button>
+
+          </div>
+
         </div>
 
         {/* RESULT */}
@@ -624,7 +813,7 @@ Generated from MAMA Health Care.
         <div className="result-card">
 
           <div className="result-orb">
-            ❤️
+            {"\u2764\uFE0F"}
           </div>
 
           <p>YOUR BMI</p>
@@ -653,26 +842,6 @@ Generated from MAMA Health Care.
           )}
 
         </div>
-
-      </div>
-
-      {/* REPORT ACTIONS */}
-
-      <div className="report-actions">
-
-        <button
-          className="download-report-btn"
-          onClick={generatePDF}
-        >
-          📄 Download PDF Report
-        </button>
-
-        <button
-          className="share-report-btn"
-          onClick={shareHealthReport}
-        >
-          📤 Share Health Report
-        </button>
 
       </div>
 
@@ -815,20 +984,35 @@ Generated from MAMA Health Care.
                 </div>
 
                 <div className="scale-labels">
+
                   <span>15</span>
                   <span>18.5</span>
                   <span>25</span>
                   <span>30</span>
                   <span>40</span>
+
                 </div>
 
               </div>
 
               <div className="scale-categories">
-                <span>Underweight</span>
-                <span>Normal</span>
-                <span>Overweight</span>
-                <span>Obesity</span>
+
+                <span>
+                  Underweight
+                </span>
+
+                <span>
+                  Normal
+                </span>
+
+                <span>
+                  Overweight
+                </span>
+
+                <span>
+                  Obesity
+                </span>
+
               </div>
 
             </div>
@@ -842,7 +1026,6 @@ Generated from MAMA Health Care.
               </span>
 
               <div>
-
                 <h3>
                   BMI Progress
                 </h3>
@@ -850,7 +1033,6 @@ Generated from MAMA Health Care.
                 <p>
                   {getTrendText()}
                 </p>
-
               </div>
 
             </div>
@@ -871,7 +1053,9 @@ Generated from MAMA Health Care.
                   .map((report) => {
 
                     const chartBMI =
-                      Number(report.bmi);
+                      Number(
+                        report.bmi
+                      );
 
                     const minBMI = 15;
                     const maxBMI = 40;
@@ -973,7 +1157,7 @@ Generated from MAMA Health Care.
 
             <p>
               Calculate your BMI to generate
-              health insights.
+              personalized health insights.
             </p>
 
           </div>
@@ -1234,13 +1418,17 @@ Generated from MAMA Health Care.
       <div className="health-tips">
 
         <h2>
-          💡 Healthy Lifestyle Tips
+          {"\uD83D\uDCA1"} Healthy
+          Lifestyle Tips
         </h2>
 
         <div className="tips-grid">
 
           <div className="tip">
-            <span>💧</span>
+
+            <span>
+              {"\uD83D\uDCA7"}
+            </span>
 
             <h3>
               Stay Hydrated
@@ -1250,10 +1438,14 @@ Generated from MAMA Health Care.
               Drink enough water throughout
               the day.
             </p>
+
           </div>
 
           <div className="tip">
-            <span>🏃</span>
+
+            <span>
+              {"\uD83C\uDFC3"}
+            </span>
 
             <h3>
               Stay Active
@@ -1263,10 +1455,14 @@ Generated from MAMA Health Care.
               Include regular physical
               activity in your routine.
             </p>
+
           </div>
 
           <div className="tip">
-            <span>🥗</span>
+
+            <span>
+              {"\uD83E\uDD57"}
+            </span>
 
             <h3>
               Eat Balanced
@@ -1276,10 +1472,14 @@ Generated from MAMA Health Care.
               Choose a variety of
               nutritious foods.
             </p>
+
           </div>
 
           <div className="tip">
-            <span>😴</span>
+
+            <span>
+              {"\uD83D\uDE34"}
+            </span>
 
             <h3>
               Sleep Well
@@ -1289,6 +1489,7 @@ Generated from MAMA Health Care.
               Give your body enough time
               to rest.
             </p>
+
           </div>
 
         </div>
@@ -1300,3 +1501,4 @@ Generated from MAMA Health Care.
 }
 
 export default HealthReport;
+
